@@ -1,0 +1,53 @@
+Regler: http://upload.snakesandlattes.com/rules/q/Qwirkle.pdf
+
+Del 0:
+- Sette opp en pythonpakke-
+- Sette opp dokumentasjon.
+- Sette opp installasjon og kartlegge avhengigheter.
+
+Del 1:
+- Beskrive et brett (brettet er i prinsippet sinnsykt stort. innfør koordinatsystem, men bruk "lenkede lister").
+- Avgjøre om et brett er lovlig.
+- Avgjøre om et trekk er lovlig.
+	- inkludert trekk med flere brikker.
+- Finne poengsummen for et lovlig trekk.
+
+Oppgaver:
+- Sannsynligvis implementere "rekker" el. til bruk i lovlighet og poensum. Deretter analysere en brett og identifisere alle rekker.
+- Notasjon for lagring av brett til fil.
+- Etablere datastrukturer for raskt oppslag via ulike nøkler (posisjon, farge, "naboskap", liste av alle "rekker").
+
+
+Del 2:
+- implementere posen, spillere, brettet, og "et spill"
+- Finne alle lovlige trekk (gitt 6 brikker, eller generelt)
+	- hvordan teste alle muligheter, men ikke flere.
+- Implementere starten av spillet.
+- Implementere slutten av spillet.
+
+Del 3:
+- Holde oversikt over hvordan lovlige trekk oppdateres ved et trekk (effekter er hovedsakelig lokale)
+- Implementere en spiller som gjør det mest poenggivende trekket.
+
+Del 4:
+- Implementere GUI for å spille lokalt.
+- To spillere. Data-spiller.
+
+Del 5:
+- Spille via nettverk.
+
+Del 6:
+- Mer sofistikert spillalgoritme.
+- Mer sofistikert kunskapsbank (statistiske antagelser om brikkene jeg selv ikke har sett (hva er sannsynligheten for at motstanderen kan ha en gitt brikke)
+
+
+Andre liknende prosjekter:
+Det er 73 qwirkle-prosjekter på github. EN del er laget kun for å holde styr på poeng, og mange er løsninger på en oppgave som ble gitt på "university of Twente vinteren 2016. Java, Javascript, C#, C++, Python og PHP er de mes populære språkene. Datamaskinen er som regel i flere vanskelighetsgrader:
+- Første lovlige trekk den kommer over.
+- (Et) beste trekk  med kun én brikke.
+- (Et) beste trekk med mulighet for mer enn en brikke.
+Jeg har ikke gått grundig gjennom, men av de prosjektene som fanget min interesse var det ingen som hadde gått lenger (ikke engang gjøre et rimelig valg blandt de mest poenggivende alternativene).
+Ellers er det en del av prosjektene som fokuserer på å lage GUI eller å kommunisere over nettverk. Sist men ikke minst er det en del prosjekter med lite tester og få commits.
+
+
+

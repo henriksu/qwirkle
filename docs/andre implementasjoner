@@ -1,0 +1,59 @@
+*alxmjo/Quirk (19 commits, 1 contributor, 0 tests, intelligens: ingen, må spilles helt manuelt)
+Forenklet utgave (færre brikker) av spillet. Skrevet for å lære seg C++. Aksepterer ikke trekk med mer enn én brikke.
+Ekstra poeng for å komplettere 3 (dvs. 6) på rad er med.
+Klasser:
+Pool (brikker som kan trekkes)
+Board (holder styr på hva som ligger hvor, om et trekk er lovlig og hvor mange poeng det gir. Bruker en 2D array med chars. Evaluerer kun rad/kolonnen man legger i (såkalte runs), men gjør det på nytt for hvert trekk.)
+Player (holder styr på poeng og brikker på hånden. Ingen logikk for å velge trekk)
+Game (Har Pool, Board og Player-variabler. Holder styr på tilstanden. Spillet er kun for mennekser, ingen roboter)
+Kommentar: rent kommandolinje program.
+
+*iamdanfox/qwirkler (123 commits, 1 contributor, tests: ja, intelligens: )
+Kommentar: readme-filen fokuserer på at det er en "Gready solver".
+Klasser (Mange klasser, tar bare med det interessante):
+Piece (som bruker små hjelpeklasser Colour og Shape)
+Bag (til å trekke fra.)
+GameState (inneholde logikken for å velge et godt trekk. Ikke heldig når vi skal eksprimetere med nettopp dette.)
+
+
+iamdanfox/qwirkler (69 commits, 1 contributor, tests: ser ingen, intelligens: neppe)
+Fokuserer på å lage en web basert applikasjon. Multiplayer. Jeg kan lite JS, men koden virker lite partisjonert. Dårlige navn.
+
+Judastutdas/Qwirkle-Spiel (6 commits, 1 contributor, tests: ?, intelligens: ?)
+Ble gitt opp før han fikk gjort noe særlig.
+
+glennbech/Qwirkle (5 commits, 1 contributor, tests: ja, intelligens: )
+Tilsynelatende halvferdig.
+Bruker en 2D array til brettet. Har feil i algoritmen som sjekker at et brett er lovlig.
+
+*oplosthee/qwirkle (29 commits, 2 contributors, tests: ja, intelligens: ja)
+bruker beregningstid til å sette avskelighetsgraden på en spiller. Fiffig.
+
+mattdotmatt/qwirkle.js (9 commits, 1 contributor, tests: ja, intelligens: ?)
+Nok en pakke med server og masse greier. Neppe nyttig.
+
+
+*regnerus/qwirkle (87 commits, 2 contributors, tests: ja, intelligens: ja)
+Ser interessant ut.
+
+
+StijnOverduin/Qwirkle (92 commits, 0 contributors, tests: ja, intelligens: førte og beste)
+Nok et tilfelle av at tenktetid brukes til å avgjøre vanskelighetsgrad.
+
+*Rick053/Qwirkle (139 commits, 2 contributors, tests: ja, intelligens: tilfeldig lovlig trekk)
+Tja. Ser ut til å være mye greier, med servere osv. Ser ryddig ut.
+
+
+Ziomeczki/Qwirkle (57 commits, 2 contributors, tests: nei, intelligens:?)
+Er forsøkt partisjonert, men lykkes ikke helt. Posen med brikker er implementert sammen med "server".
+
+
+
+
+
+
+
+
+
+
+
