@@ -1,94 +1,59 @@
 import random
-
-from qwirkle.tile import Tile, Color, Shape
-
-class Position():
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-class Board():
-    def __init__(self):
-        self.tiles = []
-    
-    def is_allowed(self, tiles_and_positions):
-        pass
-        #return a bool
-        
-    def make_move(self, tiles_and_positions):
-        positions = None
-        if self.is_allowed(tiles_and_positions):
-            score = self.score(positions)
-            self.tiles.extend(tiles_and_positions)
-            return score
-        else:
-            raise ValueError()
-            # TODO: Let a level closer to GUI expect this error.
-            # It is not the boards responsibility to expect clumsy players,
-            # and besides if the player is an AI, the error will have to be
-            # dealt with very differently.
-            # TODO: Subclass ValueError. 
+from qwirkle.bag import Bag, Hand
+from qwirkle.board import Board
 
 
 class Game():
     def __init__(self, players, seed=None):
-        self.bag = self._make_bag(seed)
+        self.bag = Bag.make_default(seed)
         self.board = Board()
+        self.num_players = players
         self.hand = players * [None]
         for player in range(players):
-            self.hand[player] = self._draw_tiles(6)  # Each player starts with 6 tiles.
-            
-        self.current_player = 0
-        # TODO: follow the rules.
-        # The player that can play the most tiles, starts.
+            self.hand[player] = Hand.init_from(self.bag)# Each player starts with 6 tiles.
+        self.current_player = self.determine_starting_player()
         self.none_has_finished = True
 
-    def get_tiles(self, player):
-        return self.hand[player]
+    def determine_starting_player(self):
+        starting_players = []
+        max_score = 0
+        for player, hand in enumerate(self.hand):
+            score = hand.starting_score()
+            if score > max_score:
+                starting_players = []
+                max_score = score
+            if score == max_score:
+                starting_players.append(player)
+        
+        starting_player = random.choice(starting_players)
+        return starting_player
 
-    def _draw_tiles(self, number):
-        # Look into how this should be done if there are not enough tiles.
-        result = self.bag[:number]
-        self.bag = self.bag[number:]
-        return result
+    def get_tiles(self, player):
+        return self.hand[player].tiles
 
     def make_move(self, tiles_and_positions):
-        # Check current players hand
+        _, tiles = zip(*tiles_and_positions)
+        hand = self.hand[self.current_player]
+        hand.validate_choice(tiles)
         board_score = self.board.make_move(tiles_and_positions)
-        self.fill_hand_for_player(self.current_player)
-        if self.hand_is_empty(self.current_player) and self.none_has_finished:
+        hand.fill_from(self.bag)
+        score = self._compute_score(hand, board_score)
+        self.scores[self.current_player].append(score)
+        self._advance_player()
+    
+    def _compute_score(self, hand, board_score):
+        if hand.is_empty() and self.none_has_finished:
             score = board_score + 6
             self.none_has_finished = False
         else:
             score = board_score
-        self.scores[self.current_player].append(score)
+        return score
 
     def exchange_tiles(self, tiles):
-        self.validate_choice(tiles)
-        new_tiles = self.exchange_tiles_in_bag(tiles)
-        self.remove_old_tiles_from_hand(tiles)
-        self.hand[self.current_player].extend(new_tiles)
-        # Check that the required number can be drawn (not too few tiles left), or throw.
-        # Draw new tiles.
-        # Reinsert the old ones and shuffle.
+        self.hand[self.current_player].exchange_tiles(tiles, self.bag)
         self.scores[self.current_player].append(0)
+        self._advance_player()
 
-    def validate_choice(self, tiles):
-        n = len(tiles)
-        if n < 1:
-            raise ValueError() # TODO: Subclass and explain that at least one tile must be changed.
-        # Check the tile to loose are on the current players hand (rules says at least one must be exchanged).
+    def _advance_player(self):
+        self.current_player = (self.current_player + 1) % self.num_players
     
-    def remove_old_tiles_from_hand(self, old_tiles):
-        hand = self.hand[self.current_player]
-        for tile in old_tiles:
-            hand.remove(tile)
-    
-    def exchange_tiles_in_bag(self, old_tiles):
-        n = len(old_tiles)
-        if len(self.bag) < n:
-            raise ValueError # TODO: Make more specific .
-        new_tiles = self._draw_tiles(n)
-        self.bag.extend(old_tiles)
-        random.shuffle(self.bag)
-        return new_tiles
