@@ -39,7 +39,7 @@ Del 5:
 Del 6:
 - Mer sofistikert spillalgoritme.
 - Mer sofistikert kunskapsbank (statistiske antagelser om brikkene jeg selv ikke har sett (hva er sannsynligheten for at motstanderen kan ha en gitt brikke)
-
+- AIen trenger ikke sjekke alle brikkene når den leter etter trekk. Har den to like, vet vi at høyst en av dem kan legges ut i en gitt tur.
 
 Andre liknende prosjekter:
 Det er 73 qwirkle-prosjekter på github. EN del er laget kun for å holde styr på poeng, og mange er løsninger på en oppgave som ble gitt på "university of Twente vinteren 2016. Java, Javascript, C#, C++, Python og PHP er de mes populære språkene. Datamaskinen er som regel i flere vanskelighetsgrader:
