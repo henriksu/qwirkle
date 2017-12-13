@@ -23,7 +23,7 @@ Del 2:
 - Finne alle lovlige trekk (gitt 6 brikker, eller generelt)
 	- hvordan teste alle muligheter, men ikke flere.
 - Implementere starten av spillet.
-- Implementere slutten av spillet.
+- Implementere slutten av spillet (spillere må kunne melde pass når bagen er tom).
 
 Del 3:
 - Holde oversikt over hvordan lovlige trekk oppdateres ved et trekk (effekter er hovedsakelig lokale)
