@@ -1,6 +1,7 @@
 import unittest
 from qwirkle.tile import Tile, Color, Shape
 from qwirkle.bag import Bag, EmptyBagError
+import random
 
 
 class TestBag(unittest.TestCase):
@@ -84,16 +85,60 @@ class TestBag(unittest.TestCase):
         self.assertEqual(98, len(result))
 
     def test_insert(self):
-        pass
-        # length increases and inserted tiles does not
-        # stay at the end (use seed to guarantee).
+        random.seed(0)
+        tiles_in_bag =[Tile(Color.RED, Shape.CIRCLE),
+                       Tile(Color.RED, Shape.CIRCLE),
+                       ]
+        bag = Bag(tiles_in_bag)
+        tile = Tile(Color.RED, Shape.X)
+        self.assertEqual(2, len(bag.tiles))
+        bag.insert([tile])
+        self.assertEqual(3, len(bag.tiles))
+        self.assertNotEqual(bag.tiles[-1], tile)
+
+    def test_exchange_tile(self):
+        tiles_in_bag =[Tile(Color.RED, Shape.STAR)]
+        bag = Bag(tiles_in_bag)
+        tile = Tile(Color.RED, Shape.X)
+        self.assertEqual(1, len(bag.tiles))
+        returned_tile = bag.exchange_tiles([tile])
+        self.assertEqual(1, len(bag.tiles))
+        self.assertEqual(bag.tiles[-1], tile)
+        self.assertEqual(1, len(returned_tile))
+        self.assertEqual(Tile(Color.RED, Shape.STAR),
+                         returned_tile[0])
     
     def test_exchange_tiles(self):
-        pass
-        # happy path
+        random.seed(0)
+        tiles_in_bag =[Tile(Color.RED, Shape.CIRCLE),
+                       Tile(Color.RED, Shape.CROSS),
+                       Tile(Color.RED, Shape.DIAMOND),
+                       Tile(Color.RED, Shape.SQUARE),
+                       Tile(Color.RED, Shape.STAR),
+                       ]
+        bag = Bag(tiles_in_bag)
+        tile = Tile(Color.RED, Shape.X)
+        self.assertEqual(5, len(bag.tiles))
+        returned_tile = bag.exchange_tiles([tile])
+        self.assertEqual(5, len(bag.tiles))
+        self.assertNotEqual(bag.tiles[-1], tile)
+        self.assertEqual(1, len(returned_tile))
+        self.assertEqual(Tile(Color.RED, Shape.CIRCLE),
+                         returned_tile[0])
         
     def test_cant_exchange_more_tiles_than_supply(self):
-        pass
-        # Test raises
-        # with self.assertRaises(EmptyBagError):
-        #     pass
+        random.seed(0)
+        tiles_in_bag =[Tile(Color.RED, Shape.CIRCLE),
+                       Tile(Color.RED, Shape.CROSS),
+                       ]
+        bag = Bag(tiles_in_bag)
+        tiles = [
+            Tile(Color.RED, Shape.DIAMOND),
+            Tile(Color.RED, Shape.SQUARE),
+            Tile(Color.RED, Shape.STAR),
+            ]
+        self.assertEqual(2, len(bag.tiles))
+        with self.assertRaises(EmptyBagError):
+            bag.exchange_tiles(tiles)
+        self.assertEqual(2, len(bag.tiles))
+        self.assertListEqual(bag.tiles, tiles_in_bag)
