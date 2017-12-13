@@ -1,5 +1,6 @@
 import random
-from qwirkle.bag import Bag, Hand
+from qwirkle.bag import Bag
+from qwirkle.hand import Hand
 from qwirkle.board import Board
 
 
