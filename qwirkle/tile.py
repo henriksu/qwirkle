@@ -32,3 +32,6 @@ class Tile():
     def __eq__(self, other):
         return self.color == other.color and \
             self.shape == other.shape
+            
+    def __hash__(self):
+        return hash(self.color) ^ hash(self.shape)

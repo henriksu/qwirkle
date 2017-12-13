@@ -15,7 +15,7 @@ class Bag():
                 bag.extend(3 * [Tile(color, shape)])
         random.seed(seed)
         random.shuffle(bag) 
-        return bag
+        return cls(bag)
 
     def exchange_tiles(self, old_tiles):
         n = len(old_tiles)
@@ -26,6 +26,7 @@ class Bag():
 
     def validate_supply(self, n):
         if len(self.tiles) < n:
+            # TODO: Reconsider name, the bag is not quite empty.
             raise EmptyBagError()
 
     def insert(self, old_tiles):
@@ -52,6 +53,7 @@ class Hand():
         return cls(tiles)
     
     def exchange_tiles(self, tiles, bag):
+        # TODO: Consider 'exchange' -> 'swap'
         self.validate_choice(tiles)
         new_tiles = bag.exchange_tiles(tiles)
         self._remove_old_tiles_from_hand(tiles)
