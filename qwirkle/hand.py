@@ -7,12 +7,12 @@ class Hand():
 
     def __init__(self, tiles):
         self.tiles = tiles
-    
+
     @classmethod
     def init_from(cls, bag):
         tiles = bag.draw_tiles(cls.CAPACITY)
         return cls(tiles)
-    
+
     def exchange_tiles(self, tiles, bag):
         # TODO: Consider 'exchange' -> 'swap'
         self.validate_choice(tiles)
@@ -46,7 +46,7 @@ class Hand():
     def _remove_old_tiles_from_hand(self, old_tiles):
         for tile in old_tiles:
             self.tiles.remove(tile)
-            
+
     def starting_score(self):
         return max(self.starting_score_color(),
                    self.starting_score_shape())
@@ -62,7 +62,7 @@ class Hand():
             score = len(set(common))
             max_score = max(max_score, score)
         return max_score
-        
+
     def starting_score_shape(self):
         max_score = 0
         for shape in Shape:

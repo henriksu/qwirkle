@@ -4,7 +4,8 @@ from qwirkle.game import Game
 
 class TestGame(unittest.TestCase):
     def test_make_game(self):
-        game = Game(players=2)
+        Game(players=2)
+
 
 class TestGameis(unittest.TestCase):
     def setUp(self):

@@ -29,10 +29,10 @@ class Tile():
         color = self.color.name.lower()
         shape = self.shape.name.lower()
         return ' '.join([color, shape])
-    
+
     def __eq__(self, other):
         return self.color == other.color and \
             self.shape == other.shape
-            
+
     def __hash__(self):
         return hash(self.color) ^ hash(self.shape)

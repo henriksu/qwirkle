@@ -5,7 +5,7 @@ from qwirkle.tile import Tile, Color, Shape
 class TileTest(unittest.TestCase):
     def test_init(self):
         self.make_one_with_each()
-    
+
     def test_string_representation(self):
         tiles = self.make_one_with_each()
         strings = [str(tile) for tile in tiles]
@@ -26,12 +26,12 @@ class TileTest(unittest.TestCase):
             Tile(Color.BLUE, Shape.STAR),
             Tile(Color.PURPLE, Shape.CROSS)]
         return result
-    
+
     def test_equal(self):
         tile1 = Tile(Color.RED, Shape.X)
         tile2 = Tile(Color.RED, Shape.X)
         self.assertEqual(tile1, tile2)
-    
+
     def test_unequal_color(self):
         tile1 = Tile(Color.RED, Shape.X)
         tile2 = Tile(Color.GREEN, Shape.X)

@@ -11,7 +11,8 @@ class Game():
         self.num_players = players
         self.hand = players * [None]
         for player in range(players):
-            self.hand[player] = Hand.init_from(self.bag)# Each player starts with 6 tiles.
+            # Each player starts with 6 tiles.
+            self.hand[player] = Hand.init_from(self.bag)
         self.current_player = self.determine_starting_player()
         self.none_has_finished = True
 
@@ -25,7 +26,7 @@ class Game():
                 max_score = score
             if score == max_score:
                 starting_players.append(player)
-        
+
         starting_player = random.choice(starting_players)
         return starting_player
 
@@ -41,7 +42,7 @@ class Game():
         score = self._compute_score(hand, board_score)
         self.scores[self.current_player].append(score)
         self._advance_player()
-    
+
     def _compute_score(self, hand, board_score):
         if hand.is_empty() and self.none_has_finished:
             score = board_score + 6
@@ -57,4 +58,3 @@ class Game():
 
     def _advance_player(self):
         self.current_player = (self.current_player + 1) % self.num_players
-    

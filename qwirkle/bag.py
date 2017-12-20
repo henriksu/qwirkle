@@ -13,7 +13,7 @@ class Bag():
             for shape in Shape:
                 bag.extend(3 * [Tile(color, shape)])
         random.seed(seed)
-        random.shuffle(bag) 
+        random.shuffle(bag)
         return cls(bag)
 
     def exchange_tiles(self, old_tiles):
@@ -31,7 +31,7 @@ class Bag():
     def insert(self, old_tiles):
         self.tiles.extend(old_tiles)
         random.shuffle(self.tiles)
-    
+
     def draw_tiles(self, number):
         # If number > len(self.tiles),
         # the remaining tiles are returned.
