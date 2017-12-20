@@ -20,6 +20,7 @@ class Shape(Enum):
 
 
 class Tile():
+    # TODO: Is this a named tuple?
     def __init__(self, color, shape):
         self.color = color
         self.shape = shape
