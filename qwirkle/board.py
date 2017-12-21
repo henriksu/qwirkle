@@ -1,15 +1,15 @@
-class Position():
-    # TODO: IS this a named tuple?
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+from collections import namedtuple
 
-    def __eq__(self, other):
-        return self.x == other.x and \
-            self.y == other.y
 
-    def __hash__(self):
-        return hash(self.x) ^ hash(self.y)
+class Position(namedtuple('Position', 'x y')):
+    def neighbour_positions(self):
+        x, y = self
+        cls = type(self)
+        north = cls(x, y + 1)
+        south = cls(x, y - 1)
+        east = cls(x + 1, y)
+        west = cls(x - 1, y)
+        return (north, south, east, west)
 
 
 class Board():
@@ -17,31 +17,15 @@ class Board():
         self.tiles = []
         if tiles is not None:
             self.tiles.extend(tiles)
-
-    def is_connected(self, move_positions):
-        if (0, 0) in move_positions:
-            return True
-        else:
-            for pos in move_positions:
-                neighbours = self.get_neighbour_positions(pos)
-                for neighbour in neighbours:
-                    if neighbour in self.positions:
-                        return True
-            else:
-                return False
-                # THis is not the whole truth, as
-                # every tile needs to be next to a new or old tile.
-                # However, the problem only arises for multi-tile moves
-                # and they are checked later by the one-strike stuff.
-
-    def get_neighbour_positions(self, position):
-        # TODO: belongs on position.
-        x, y = position
-        north = (x, y + 1)
-        south = (x, y - 1)
-        east = (x + 1, y)
-        west = (x - 1, y)
-        return (north, south, east, west)
+        # VALIDATING BOARD:
+        # 1. Add piees to board (after making copy)
+        #     While doing it, check for overlapping positions,
+        #     both among new-new and old-new (and old-old?) tiles
+        # 2. make three sets: explored positions, discovered positions,
+        # undisovered tiles
+        # Do a breadth first search.
+        # 3. Identify all strikes by positions.
+        # 4. verify that all strikes are valid (shapes & colors)
 
     @property
     def positions(self):
@@ -52,168 +36,13 @@ class Board():
         return positions
 
     def is_allowed(self, tiles_and_positions):
-        positions, _ = zip(*tiles_and_positions)
-        if self.is_connected(positions):
-            pass
-        else:
-            return False
-        if not self.unique_positions(positions):
-            return False
-        # TODO: Move into if (len(positions) > 1
-        same_row = self.all_same_row(positions)
-        same_column = self.all_same_column(positions)
-        if same_row or same_column:
-            pass
-        else:
-            return False
-
-        if len(positions) > 1:
-            # IF several tiles, ensure one strike.
-            if same_row:
-                if self.positions:
-                    existing_indexes = list(zip(*self.positions))[0]
-                else:
-                    existing_indexes = []
-                move_indexes = list(zip(*positions))[0]
-            elif same_column:
-                if self.positions:
-                    existing_indexes = list(zip(*self.positions))[1]
-                else:
-                    existing_indexes = []
-                move_indexes = list(zip(*positions))[1]
-            indexes = list(existing_indexes) + list(move_indexes)
-            strikes = self.divide_into_strikes(indexes)
-            if self.new_tiles_in_same_strike(strikes, move_indexes):
-                pass
-            else:
-                return False
-        else:
-            pass  # not needed
-
-        combined_tiles_and_position = self.tiles + tiles_and_positions
-        combined_positions = list(zip(*combined_tiles_and_position))[0]
-        for position, tile in tiles_and_positions:
-            # for multi-tile moves eighter row or column strikes are identical.
-
-            # row strike
-            y = position[1]
-            row_positions = [pos for pos in combined_positions if pos[1] == y]
-            indexes = [x for x, _ in row_positions]
-            strikes = self.divide_into_strikes(indexes)
-            for strike in strikes:
-                if position[0] in strike:
-                    break
-            strike_positions = [(x, y) for x in strike]
-            strike_tiles = [tile for position, tile in
-                            combined_tiles_and_position if
-                            position in strike_positions]
-            legal_strike = self.verify_strike(strike_tiles)
-            if not legal_strike:
-                return False
-            else:
-                pass
-            # column strike
-            x = position[0]
-            row_positions = [pos for pos in combined_positions if pos[0] == x]
-            indexes = [y for _, y in row_positions]
-            strikes = self.divide_into_strikes(indexes)
-            for strike in strikes:
-                if position[1] in strike:
-                    break
-            strike_positions = [(x, y) for y in strike]
-            strike_tiles = [tile for position, tile in
-                            combined_tiles_and_position if
-                            position in strike_positions]
-            legal_strike = self.verify_strike(strike_tiles)
-            if not legal_strike:
-                return False
-            else:
-                pass
-
-        return True
-        # return a bool.
-        # 1. Next to an existing piece (not first move).
-        # 2. In same "strike".
-        # 3. The row strikes and column strikes in which they
-        # are included, are legal (same shape/color, and
-        # all different for the other trait.
-        # TODO: Make sure these are enough conditions.
-
-        # ALTERNATE APPROACH:
-        # 1. Add piees to board (after making copy)
-        #     While doing it, check for overlapping positions,
-        #     both among new-new and old-new (and old-old?) tiles
-        # 2. make three sets: explored positions, discovered positions,
-        # undisovered tiles
-        # Do a breadth first search.
-        # 3. Identify all strikes by positions.
-        # 4. verify that all strikes are valid (shapes & colors)
-        # 5. No. 4 can be exploited for points too.
-
-    def verify_strike(self, tiles):
-        strike_length = len(tiles)
-        tiles = [(t.color, t.shape) for t in tiles]
-        colors, shapes = list(zip(*tiles))
-        num_unique_colors = len(set(colors))
-        num_unique_shapes = len(set(shapes))
-        # color_strike
-        if num_unique_colors == 1 and num_unique_shapes == strike_length:
-            return True
-        elif num_unique_shapes == 1 and num_unique_colors == strike_length:
-            return True
-        else:
-            False
-
-        # shape_strike
-
-    def divide_into_strikes(self, indexes):
-        indexes.sort()
-        strikes = []
-        current_strike = [indexes[0]]
-        for i in indexes[1:]:
-            if i == (current_strike[-1] + 1):
-                current_strike.append(i)
-            else:
-                strikes.append(current_strike)
-                current_strike = [i]
-        strikes.append(current_strike)
-        return strikes
-
-    def new_tiles_in_same_strike(self, strikes, move_indexes):
-        move_indexes = set(move_indexes)
-        count = 0
-        for strike in strikes:
-            if move_indexes & set(strike):
-                count += 1
-        return count == 1
-
-    def contiguous(self, positions):
-        # TODO: identify row/column strike only once.
-        if self.all_same_column(positions):
-            indexes = list(list(zip(*positions))[1])
-        else:
-            indexes = list(list(zip(*positions))[0])
-        indexes.sort()
-        return indexes[-1] - indexes[0] + 1 == len(indexes)
-
-    def unique_positions(self, positions):
-        # TODO: Is there a builtin for this?
-        return len(positions) == len(set(positions))
-
-    def all_same_row(self, positions):
-        # TODO: Join with self.all_same_column() to
-        # benefit from zipping only once.
-        rows = list(zip(*positions))[1]
-        return len(set(rows)) == 1
-
-    def all_same_column(self, positions):
-        columns = list(zip(*positions))[0]
-        return len(set(columns)) == 1
+        move = Move(self, tiles_and_positions)
+        return move.is_allowed()
 
     def make_move(self, tiles_and_positions):
-        positions, tiles = zip(*tiles_and_positions)
-        if self.is_allowed(tiles, positions):
-            score = self.score(positions)
+        move = Move(self, tiles_and_positions)
+        if move.is_allowed():
+            score = move.score()
             self._add_to_board(tiles_and_positions)
             return score
         else:
@@ -227,3 +56,212 @@ class Board():
     def _add_to_board(self, tiles_and_positions):
         # Placeholder in case of more elaborate data structures.
         self.tiles.extend(tiles_and_positions)
+
+    def column_indexes(self, row):
+        pos = filter(lambda pos: pos.y == row, self.positions)
+        existing_indexes = map(lambda p: p.x, pos)#list(zip(*pos))[0]
+        return existing_indexes
+
+    def row_indexes(self, column):
+        pos = filter(lambda pos: pos.x == column, self.positions)
+        existing_indexes = map(lambda p: p.y, pos)
+        return existing_indexes
+
+
+class Move():
+    def __init__(self, board, tiles_and_positions):
+        self.board = board
+        self.tiles_and_positions = tiles_and_positions
+        self.positions, self.tiles = zip(*tiles_and_positions)
+        self.columns, self.rows = list(zip(*self.positions))
+        self.combined_tiles_and_position = None
+        self.combined_positions = None
+
+    def score(self):
+        score = 0
+        if self.all_same_column():
+            pos = self.positions[0]
+            strike = self.get_column_strike(pos)
+            score += self.score_strike(strike)
+            for pos in self.positions:
+                strike = self.get_row_strike(pos)
+                score += self.score_strike(strike)
+        else:  # all same row
+            pos = self.positions[0]
+            strike = self.get_row_strike(pos)
+            score += self.score_strike(strike)
+            for pos in self.positions:
+                strike = self.get_column_strike(pos)
+                score += self.score_strike(strike)
+        return score
+
+    def score_strike(self, strike):
+        n = len(strike)
+        if n == 1:
+            return 0
+        elif n == 6:
+            return 12
+        else:
+            return n
+
+    def is_allowed(self):
+        return \
+            self.unique_positions() and \
+            self.is_connected() and\
+            self.all_new_tiles_in_same_strike() and \
+            self.is_compatible_with_surrounding_tiles()
+
+    def unique_positions(self):
+        # TODO: Check that new positions don't coincide with old ones.
+        return len(self.positions) == len(set(self.positions))
+
+    def is_connected(self):
+        if self.is_first_move():
+            return True
+        else:
+            return self.a_new_tile_touches_a_old_tile()
+        # THis is not the whole truth, as
+        # every tile needs to be next to a new or old tile.
+        # However, the problem only arises for multi-tile moves
+        # and they are checked later by the one-strike stuff.
+
+    def is_first_move(self):
+        return (0, 0) in self.positions
+
+    def a_new_tile_touches_a_old_tile(self):
+        for pos in self.positions:
+            for neighbour in pos.neighbour_positions():
+                if neighbour in self.board.positions:
+                    return True
+        return False
+
+    def all_new_tiles_in_same_strike(self):
+        return self.only_one_tile_in_move() or \
+            self.multiple_tiles_in_one_strike()
+
+    def only_one_tile_in_move(self):
+        return len(self.positions) == 1
+
+    def multiple_tiles_in_one_strike(self):
+        same_row = self.all_same_row()
+        same_column = self.all_same_column()
+        if same_row:
+            existing_indexes = self.board.column_indexes(self.positions[0][1])
+            move_indexes = self.columns
+        elif same_column:
+            existing_indexes = self.board.row_indexes(self.positions[0][0])
+            move_indexes = self.rows
+        else:
+            return False
+        result = self.verify_tiles_in_strikes(existing_indexes, move_indexes)
+        return result
+
+    def verify_tiles_in_strikes(self, existing_indexes, move_indexes):
+        strikes = self.calculate_strikes(existing_indexes, move_indexes)
+        return self.new_tiles_in_same_strike(strikes, move_indexes)
+
+    def calculate_strikes(self, existing_indexes, move_indexes):
+        indexes = list(existing_indexes) + list(move_indexes)
+        strikes = divide_into_strikes(indexes)
+        return strikes
+
+    def new_tiles_in_same_strike(self, strikes, move_indexes):
+        move_indexes = set(move_indexes)
+        count = 0
+        for strike in strikes:
+            if move_indexes & set(strike):
+                count += 1
+        return count == 1
+
+    def is_compatible_with_surrounding_tiles(self):
+        self.combined_tiles_and_position = self.board.tiles + self.tiles_and_positions
+        self.combined_positions = list(zip(*self.combined_tiles_and_position))[0]
+        if self.all_same_column():
+            if not self.verify_row_strike(self.positions[0]):
+                return False
+            for position, _ in self.tiles_and_positions:
+                if not self.verify_column_strike(position):
+                    return False
+        else:  # All same row.
+            if not self.verify_column_strike(self.positions[0]):
+                return False
+            for position, _ in self.tiles_and_positions:
+                if not self.verify_row_strike(position):
+                    return False
+        return True
+
+    def verify_row_strike(self, position):
+        strike_positions = self.get_row_strike_positions(position)
+        strike_tiles = [tile for position, tile in
+                        self.combined_tiles_and_position if
+                        position in strike_positions]
+        return is_valid_strike(strike_tiles)
+
+    def get_row_strike_positions(self, position):
+        strike = self.get_row_strike(position)
+        strike_positions = [(x, position.y) for x in strike]
+        return strike_positions
+
+    def get_row_strike(self, position):
+        y = position[1]
+        row_positions = [pos for pos in self.combined_positions if pos[1] == y]
+        indexes = [x for x, _ in row_positions]
+        strikes = divide_into_strikes(indexes)
+        for strike in strikes:
+            if position[0] in strike:
+                return strike
+
+    def verify_column_strike(self, position):
+        strike_positions = self.get_column_strike_positions(position)
+        strike_tiles = [tile for position, tile in
+                        self.combined_tiles_and_position if
+                        position in strike_positions]
+        return is_valid_strike(strike_tiles)
+
+    def get_column_strike_positions(self, position):
+        strike = self.get_column_strike(position)
+        strike_positions = [(position.x, y) for y in strike]
+        return strike_positions
+
+    def get_column_strike(self, position):
+        x = position[0]
+        row_positions = [pos for pos in self.combined_positions if pos[0] == x]
+        indexes = [y for _, y in row_positions]
+        strikes = divide_into_strikes(indexes)
+        for strike in strikes:
+            if position[1] in strike:
+                return strike
+
+    def all_same_row(self):
+        return len(set(self.rows)) == 1
+
+    def all_same_column(self):
+        return len(set(self.columns)) == 1
+
+
+def is_valid_strike(tiles):
+    strike_length = len(tiles)
+    tiles = [(t.color, t.shape) for t in tiles]
+    colors, shapes = list(zip(*tiles))
+    num_unique_colors = len(set(colors))
+    num_unique_shapes = len(set(shapes))
+    if num_unique_colors == 1 and num_unique_shapes == strike_length:
+        return True
+    elif num_unique_shapes == 1 and num_unique_colors == strike_length:
+        return True
+    else:
+        return False
+
+
+def divide_into_strikes(indexes):
+    indexes.sort()
+    strikes = []
+    current_strike = [indexes[0]]
+    for i in indexes[1:]:
+        if i == (current_strike[-1] + 1):
+            current_strike.append(i)
+        else:
+            strikes.append(current_strike)
+            current_strike = [i]
+    strikes.append(current_strike)
+    return strikes

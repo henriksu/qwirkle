@@ -45,6 +45,7 @@ class Game():
 
     def _compute_score(self, hand, board_score):
         if hand.is_empty() and self.none_has_finished:
+            # TODO: oone else will have finished.
             score = board_score + 6
             self.none_has_finished = False
         else:

@@ -23,7 +23,7 @@ Del 2:
 - Finne alle lovlige trekk (gitt 6 brikker, eller generelt)
 	- hvordan teste alle muligheter, men ikke flere.
 - Implementere starten av spillet.
-- Implementere slutten av spillet (spillere må kunne melde pass når bagen er tom).
+- Implementere slutten av spillet (spillere må kunne melde pass når bagen er tom, hvis alle melder pass må spillet avsluttes.).
 
 Del 3:
 - Holde oversikt over hvordan lovlige trekk oppdateres ved et trekk (effekter er hovedsakelig lokale)
@@ -48,6 +48,3 @@ Det er 73 qwirkle-prosjekter på github. EN del er laget kun for å holde styr p
 - (Et) beste trekk med mulighet for mer enn en brikke.
 Jeg har ikke gått grundig gjennom, men av de prosjektene som fanget min interesse var det ingen som hadde gått lenger (ikke engang gjøre et rimelig valg blandt de mest poenggivende alternativene).
 Ellers er det en del av prosjektene som fokuserer på å lage GUI eller å kommunisere over nettverk. Sist men ikke minst er det en del prosjekter med lite tester og få commits.
-
-
-
