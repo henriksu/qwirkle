@@ -14,7 +14,7 @@ class TileTest(unittest.TestCase):
                     'yellow diamond',
                     'green square',
                     'blue star',
-                    'purple cross']
+                    'purple clover']
         self.assertListEqual(expected, strings)
 
     def make_one_with_each(self):
@@ -24,7 +24,7 @@ class TileTest(unittest.TestCase):
             Tile(Color.YELLOW, Shape.DIAMOND),
             Tile(Color.GREEN, Shape.SQUARE),
             Tile(Color.BLUE, Shape.STAR),
-            Tile(Color.PURPLE, Shape.CROSS)]
+            Tile(Color.PURPLE, Shape.CLOVER)]
         return result
 
     def test_equal(self):

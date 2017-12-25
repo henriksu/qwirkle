@@ -144,35 +144,35 @@ class TestSecondMoveFromOneTile(unittest.TestCase):
 
     def test_add_two_horizontally(self):
         tile1 = Tile(Color.RED, Shape.CIRCLE)
-        tile2 = Tile(Color.RED, Shape.CROSS)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
         result = self.board.is_allowed([(Position(1, 0), tile1),
                                         (Position(2, 0), tile2)])
         self.assertTrue(result)
 
     def test_add_two_horizontally2(self):
         tile1 = Tile(Color.RED, Shape.CIRCLE)
-        tile2 = Tile(Color.RED, Shape.CROSS)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
         result = self.board.is_allowed([(Position(1, 0), tile1),
                                         (Position(-1, 0), tile2)])
         self.assertTrue(result)
 
     def test_add_two_vertically(self):
         tile1 = Tile(Color.RED, Shape.CIRCLE)
-        tile2 = Tile(Color.RED, Shape.CROSS)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
         result = self.board.is_allowed([(Position(0, 1), tile1),
                                         (Position(0, 2), tile2)])
         self.assertTrue(result)
 
     def test_add_two_vertically2(self):
         tile1 = Tile(Color.RED, Shape.CIRCLE)
-        tile2 = Tile(Color.RED, Shape.CROSS)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
         result = self.board.is_allowed([(Position(0, 1), tile1),
                                         (Position(0, -1), tile2)])
         self.assertTrue(result)
 
     def test_add_two_in_different_direction(self):
         tile1 = Tile(Color.RED, Shape.CIRCLE)
-        tile2 = Tile(Color.RED, Shape.CROSS)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
         result = self.board.is_allowed([(Position(0, 1), tile1),
                                         (Position(1, 0), tile2)])
         self.assertFalse(result)
@@ -198,10 +198,10 @@ class TestLineSpecificIndexes(unittest.TestCase):
         tile1 = Tile(Color.RED, Shape.X)
         tile2 = Tile(Color.RED, Shape.CIRCLE)
         tile3 = Tile(Color.RED, Shape.SQUARE)
-        tile4 = Tile(Color.RED, Shape.CROSS)
-        tile5 = Tile(Color.GREEN, Shape.CROSS)
-        tile6 = Tile(Color.ORANGE, Shape.CROSS)
-        tile7 = Tile(Color.YELLOW, Shape.CROSS)
+        tile4 = Tile(Color.RED, Shape.CLOVER)
+        tile5 = Tile(Color.GREEN, Shape.CLOVER)
+        tile6 = Tile(Color.ORANGE, Shape.CLOVER)
+        tile7 = Tile(Color.YELLOW, Shape.CLOVER)
         self.board = Board([(Position(0, 0), tile1),
                             (Position(1, 0), tile2),
                             (Position(2, 0), tile3),
@@ -242,21 +242,21 @@ class TestRowStrikes(unittest.TestCase):
 
     def test_legal_multi_tile_row(self):
         tile1 = Tile(Color.RED, Shape.DIAMOND)
-        tile2 = Tile(Color.RED, Shape.CROSS)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
         result = self.board.is_allowed([(Position(1, 0), tile1),
                                         (Position(2, 0), tile2)])
         self.assertTrue(result)
 
     def test_illegal_multi_tile_row2(self):
         tile1 = Tile(Color.GREEN, Shape.DIAMOND)
-        tile2 = Tile(Color.RED, Shape.CROSS)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
         result = self.board.is_allowed([(Position(0, 1), tile1),
                                         (Position(1, 1), tile2)])
         self.assertFalse(result)
 
     def test_illegal_multi_tile_row1(self):
         tile1 = Tile(Color.GREEN, Shape.DIAMOND)
-        tile2 = Tile(Color.RED, Shape.CROSS)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
         result = self.board.is_allowed([(Position(1, 0), tile1),
                                         (Position(2, 0), tile2)])
         self.assertFalse(result)
@@ -286,7 +286,7 @@ class TestMakeMove(unittest.TestCase):
 
     def test_qwirkle_score(self):
         tile1 = Tile(Color.RED, Shape.CIRCLE)
-        tile2 = Tile(Color.RED, Shape.CROSS)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
         tile3 = Tile(Color.RED, Shape.DIAMOND)
         tile4 = Tile(Color.RED, Shape.SQUARE)
         tile5 = Tile(Color.RED, Shape.STAR)

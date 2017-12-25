@@ -16,8 +16,8 @@ class TestGameis(unittest.TestCase):
         p1 = [str(tile) for tile in p1]
         p2 = self.game.get_tiles(player=1)
         p2 = [str(tile) for tile in p2]
-        print(p1)
-        print(p2)
+#        print(p1)
+#        print(p2)
 
 
 if __name__ == '__main__':

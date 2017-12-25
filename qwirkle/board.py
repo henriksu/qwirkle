@@ -3,12 +3,12 @@ from collections import namedtuple
 
 class Position(namedtuple('Position', 'x y')):
     def neighbour_positions(self):
-        x, y = self
+        x_coordinate, y_coordinate = self
         cls = type(self)
-        north = cls(x, y + 1)
-        south = cls(x, y - 1)
-        east = cls(x + 1, y)
-        west = cls(x - 1, y)
+        north = cls(x_coordinate, y_coordinate + 1)
+        south = cls(x_coordinate, y_coordinate - 1)
+        east = cls(x_coordinate + 1, y_coordinate)
+        west = cls(x_coordinate - 1, y_coordinate)
         return (north, south, east, west)
 
 

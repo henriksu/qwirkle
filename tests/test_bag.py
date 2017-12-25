@@ -14,42 +14,42 @@ class TestBag(unittest.TestCase):
         self.remove_three(tiles, Tile(Color.RED, Shape.DIAMOND))
         self.remove_three(tiles, Tile(Color.RED, Shape.SQUARE))
         self.remove_three(tiles, Tile(Color.RED, Shape.STAR))
-        self.remove_three(tiles, Tile(Color.RED, Shape.CROSS))
+        self.remove_three(tiles, Tile(Color.RED, Shape.CLOVER))
 
         self.remove_three(tiles, Tile(Color.ORANGE, Shape.CIRCLE))
         self.remove_three(tiles, Tile(Color.ORANGE, Shape.X))
         self.remove_three(tiles, Tile(Color.ORANGE, Shape.DIAMOND))
         self.remove_three(tiles, Tile(Color.ORANGE, Shape.SQUARE))
         self.remove_three(tiles, Tile(Color.ORANGE, Shape.STAR))
-        self.remove_three(tiles, Tile(Color.ORANGE, Shape.CROSS))
+        self.remove_three(tiles, Tile(Color.ORANGE, Shape.CLOVER))
 
         self.remove_three(tiles, Tile(Color.YELLOW, Shape.CIRCLE))
         self.remove_three(tiles, Tile(Color.YELLOW, Shape.X))
         self.remove_three(tiles, Tile(Color.YELLOW, Shape.DIAMOND))
         self.remove_three(tiles, Tile(Color.YELLOW, Shape.SQUARE))
         self.remove_three(tiles, Tile(Color.YELLOW, Shape.STAR))
-        self.remove_three(tiles, Tile(Color.YELLOW, Shape.CROSS))
+        self.remove_three(tiles, Tile(Color.YELLOW, Shape.CLOVER))
 
         self.remove_three(tiles, Tile(Color.GREEN, Shape.CIRCLE))
         self.remove_three(tiles, Tile(Color.GREEN, Shape.X))
         self.remove_three(tiles, Tile(Color.GREEN, Shape.DIAMOND))
         self.remove_three(tiles, Tile(Color.GREEN, Shape.SQUARE))
         self.remove_three(tiles, Tile(Color.GREEN, Shape.STAR))
-        self.remove_three(tiles, Tile(Color.GREEN, Shape.CROSS))
+        self.remove_three(tiles, Tile(Color.GREEN, Shape.CLOVER))
 
         self.remove_three(tiles, Tile(Color.BLUE, Shape.CIRCLE))
         self.remove_three(tiles, Tile(Color.BLUE, Shape.X))
         self.remove_three(tiles, Tile(Color.BLUE, Shape.DIAMOND))
         self.remove_three(tiles, Tile(Color.BLUE, Shape.SQUARE))
         self.remove_three(tiles, Tile(Color.BLUE, Shape.STAR))
-        self.remove_three(tiles, Tile(Color.BLUE, Shape.CROSS))
+        self.remove_three(tiles, Tile(Color.BLUE, Shape.CLOVER))
 
         self.remove_three(tiles, Tile(Color.PURPLE, Shape.CIRCLE))
         self.remove_three(tiles, Tile(Color.PURPLE, Shape.X))
         self.remove_three(tiles, Tile(Color.PURPLE, Shape.DIAMOND))
         self.remove_three(tiles, Tile(Color.PURPLE, Shape.SQUARE))
         self.remove_three(tiles, Tile(Color.PURPLE, Shape.STAR))
-        self.remove_three(tiles, Tile(Color.PURPLE, Shape.CROSS))
+        self.remove_three(tiles, Tile(Color.PURPLE, Shape.CLOVER))
 
         self.assertEqual(0, len(tiles))
 
@@ -111,7 +111,7 @@ class TestBag(unittest.TestCase):
     def test_exchange_tiles(self):
         random.seed(0)
         tiles_in_bag = [Tile(Color.RED, Shape.CIRCLE),
-                        Tile(Color.RED, Shape.CROSS),
+                        Tile(Color.RED, Shape.CLOVER),
                         Tile(Color.RED, Shape.DIAMOND),
                         Tile(Color.RED, Shape.SQUARE),
                         Tile(Color.RED, Shape.STAR),
@@ -129,7 +129,7 @@ class TestBag(unittest.TestCase):
     def test_cant_exchange_more_tiles_than_supply(self):
         random.seed(0)
         tiles_in_bag = [Tile(Color.RED, Shape.CIRCLE),
-                        Tile(Color.RED, Shape.CROSS),
+                        Tile(Color.RED, Shape.CLOVER),
                         ]
         bag = Bag(tiles_in_bag)
         tiles = [

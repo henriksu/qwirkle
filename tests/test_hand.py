@@ -12,7 +12,7 @@ class TestHand(unittest.TestCase):
                         Tile(Color.YELLOW, Shape.DIAMOND),
                         Tile(Color.GREEN, Shape.SQUARE),
                         Tile(Color.BLUE, Shape.STAR),
-                        Tile(Color.PURPLE, Shape.CROSS)]
+                        Tile(Color.PURPLE, Shape.CLOVER)]
         bag = Bag(tiles_in_bag)
         hand = Hand.init_from(bag)
         expected = set(tiles_in_bag)
@@ -25,7 +25,7 @@ class TestHand(unittest.TestCase):
                          Tile(Color.YELLOW, Shape.DIAMOND),
                          Tile(Color.GREEN, Shape.SQUARE),
                          Tile(Color.BLUE, Shape.STAR),
-                         Tile(Color.PURPLE, Shape.CROSS), ]
+                         Tile(Color.PURPLE, Shape.CLOVER), ]
         bag = Bag(tiles_in_hand)
         hand = Hand.init_from(bag)
         del bag
@@ -34,7 +34,7 @@ class TestHand(unittest.TestCase):
                          Tile(Color.ORANGE, Shape.DIAMOND),
                          Tile(Color.YELLOW, Shape.SQUARE),
                          Tile(Color.GREEN, Shape.STAR),
-                         Tile(Color.BLUE, Shape.CROSS), ]
+                         Tile(Color.BLUE, Shape.CLOVER), ]
         bag = Bag(tiles_for_bag)
         hand.exchange_tiles(copy(tiles_in_hand), bag)
         self.assertSetEqual(set(tiles_for_bag), set(hand.tiles))
@@ -46,7 +46,7 @@ class TestHand(unittest.TestCase):
                          Tile(Color.YELLOW, Shape.DIAMOND),
                          Tile(Color.GREEN, Shape.SQUARE),
                          Tile(Color.BLUE, Shape.STAR),
-                         Tile(Color.PURPLE, Shape.CROSS), ]
+                         Tile(Color.PURPLE, Shape.CLOVER), ]
         bag = Bag(tiles_in_hand)
         hand = Hand.init_from(bag)
         del bag
@@ -66,7 +66,7 @@ class TestHand(unittest.TestCase):
                          Tile(Color.YELLOW, Shape.DIAMOND),
                          Tile(Color.GREEN, Shape.SQUARE),
                          Tile(Color.BLUE, Shape.STAR),
-                         Tile(Color.PURPLE, Shape.CROSS), ]
+                         Tile(Color.PURPLE, Shape.CLOVER), ]
         bag = Bag(tiles_in_hand)
         hand = Hand.init_from(bag)
         del bag
@@ -85,7 +85,7 @@ class TestHand(unittest.TestCase):
                          Tile(Color.YELLOW, Shape.DIAMOND),
                          Tile(Color.GREEN, Shape.SQUARE),
                          Tile(Color.BLUE, Shape.STAR),
-                         Tile(Color.PURPLE, Shape.CROSS), ]
+                         Tile(Color.PURPLE, Shape.CLOVER), ]
         bag = Bag(tiles_in_hand)
         hand = Hand.init_from(bag)
         del bag
@@ -94,7 +94,7 @@ class TestHand(unittest.TestCase):
                          Tile(Color.ORANGE, Shape.DIAMOND),
                          Tile(Color.YELLOW, Shape.SQUARE),
                          Tile(Color.GREEN, Shape.STAR),
-                         Tile(Color.BLUE, Shape.CROSS), ]
+                         Tile(Color.BLUE, Shape.CLOVER), ]
         bag = Bag(tiles_for_bag)
         with self.assertRaises(MissingTileError):
             hand.exchange_tiles(2 * [Tile(Color.YELLOW, Shape.DIAMOND)], bag)
@@ -107,7 +107,7 @@ class TestHand(unittest.TestCase):
                           Tile(Color.YELLOW, Shape.DIAMOND),
                           Tile(Color.GREEN, Shape.SQUARE),
                           Tile(Color.BLUE, Shape.STAR),
-                          Tile(Color.PURPLE, Shape.CROSS), ]
+                          Tile(Color.PURPLE, Shape.CLOVER), ]
         bag = Bag(tiles_for_hand)
         hand = Hand([])
         hand.fill_from(bag)
@@ -120,7 +120,7 @@ class TestHand(unittest.TestCase):
                          Tile(Color.YELLOW, Shape.DIAMOND),
                          Tile(Color.GREEN, Shape.SQUARE),
                          Tile(Color.BLUE, Shape.STAR),
-                         Tile(Color.PURPLE, Shape.CROSS), ]
+                         Tile(Color.PURPLE, Shape.CLOVER), ]
         bag = Bag(tiles_in_hand)
         hand = Hand.init_from(bag)
         del bag
@@ -129,7 +129,7 @@ class TestHand(unittest.TestCase):
                          Tile(Color.ORANGE, Shape.DIAMOND),
                          Tile(Color.YELLOW, Shape.SQUARE),
                          Tile(Color.GREEN, Shape.STAR),
-                         Tile(Color.BLUE, Shape.CROSS), ]
+                         Tile(Color.BLUE, Shape.CLOVER), ]
         bag = Bag(tiles_for_bag)
         hand.fill_from(bag)
         self.assertSetEqual(set(hand.tiles), set(tiles_in_hand))
@@ -146,7 +146,7 @@ class TestHand(unittest.TestCase):
                          Tile(Color.YELLOW, Shape.DIAMOND),
                          Tile(Color.GREEN, Shape.SQUARE),
                          Tile(Color.BLUE, Shape.STAR),
-                         Tile(Color.PURPLE, Shape.CROSS), ]
+                         Tile(Color.PURPLE, Shape.CLOVER), ]
         bag = Bag(tiles_for_bag)
         hand.fill_from(bag)
         self.assertSetEqual(set(tiles_in_hand), set(hand.tiles))
@@ -167,7 +167,7 @@ class TestHand(unittest.TestCase):
                          Tile(Color.YELLOW, Shape.DIAMOND),
                          Tile(Color.GREEN, Shape.SQUARE),
                          Tile(Color.BLUE, Shape.STAR),
-                         Tile(Color.PURPLE, Shape.CROSS)]
+                         Tile(Color.PURPLE, Shape.CLOVER)]
         hand = Hand(tiles_in_hand)
         self.assertEqual(1, hand.starting_score())
 
@@ -177,7 +177,7 @@ class TestHand(unittest.TestCase):
                          Tile(Color.RED, Shape.DIAMOND),
                          Tile(Color.RED, Shape.SQUARE),
                          Tile(Color.RED, Shape.STAR),
-                         Tile(Color.RED, Shape.CROSS)]
+                         Tile(Color.RED, Shape.CLOVER)]
         hand = Hand(tiles_in_hand)
         self.assertEqual(6, hand.starting_score())
 
@@ -197,7 +197,7 @@ class TestHand(unittest.TestCase):
                          Tile(Color.RED, Shape.DIAMOND),
                          Tile(Color.RED, Shape.X),
                          Tile(Color.RED, Shape.STAR),
-                         Tile(Color.RED, Shape.CROSS)]
+                         Tile(Color.RED, Shape.CLOVER)]
         hand = Hand(tiles_in_hand)
         self.assertEqual(5, hand.starting_score())
 
@@ -217,7 +217,7 @@ class TestHand(unittest.TestCase):
                          Tile(Color.RED, Shape.DIAMOND),
                          Tile(Color.YELLOW, Shape.X),
                          Tile(Color.GREEN, Shape.STAR),
-                         Tile(Color.PURPLE, Shape.CROSS)]
+                         Tile(Color.PURPLE, Shape.CLOVER)]
         hand = Hand(tiles_in_hand)
         self.assertEqual(3, hand.starting_score())
 
