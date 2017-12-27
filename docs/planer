@@ -6,11 +6,7 @@ Del 0:
 - Sette opp installasjon og kartlegge avhengigheter.
 
 Del 1:
-- Beskrive et brett (brettet er i prinsippet sinnsykt stort. innfør koordinatsystem, men bruk "lenkede lister").
-- Avgjøre om et brett er lovlig.
-- Avgjøre om et trekk er lovlig.
-	- inkludert trekk med flere brikker.
-- Finne poengsummen for et lovlig trekk.
+- Avgjøre om et brett er lovlig (ved initialisering med brikker).
 
 Oppgaver:
 - Sannsynligvis implementere "rekker" el. til bruk i lovlighet og poensum. Deretter analysere en brett og identifisere alle rekker.
@@ -19,11 +15,11 @@ Oppgaver:
 
 
 Del 2:
-- implementere posen, spillere, brettet, og "et spill"
 - Finne alle lovlige trekk (gitt 6 brikker, eller generelt)
 	- hvordan teste alle muligheter, men ikke flere.
 - Implementere starten av spillet.
 - Implementere slutten av spillet (spillere må kunne melde pass når bagen er tom, hvis alle melder pass må spillet avsluttes.).
+- Skrive mail til folk som vet om punktet ovenfor (melde pass) og filformat og hvordan AI de bruker, og om spillet er løst).
 
 Del 3:
 - Holde oversikt over hvordan lovlige trekk oppdateres ved et trekk (effekter er hovedsakelig lokale)

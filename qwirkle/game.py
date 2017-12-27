@@ -2,25 +2,61 @@ import random
 from qwirkle.bag import Bag
 from qwirkle.hand import Hand
 from qwirkle.board import Board
+import math
+
+
+class Player():
+    def __init__(self, hand, scores=None):
+        self.hand = hand
+        if scores is not None:
+            self.scores = scores
+        else:
+            self.scores = []
+
+    def total_score(self):
+        return sum(self.scores)
+
+    def no_score_turn(self):
+        self.scores.append(0)
+
+    def score(self, points):
+        self.scores.append(points)
+
+    @classmethod
+    def init_from(cls, bag):
+        hand = Hand.init_from(bag)
+        return cls(hand)
 
 
 class Game():
-    def __init__(self, players, seed=None):
-        self.bag = Bag.make_default(seed)
-        self.board = Board()
-        self.num_players = players
-        self.hand = players * [None]
-        for player in range(players):
-            # Each player starts with 6 tiles.
-            self.hand[player] = Hand.init_from(self.bag)
-        self.current_player = self.determine_starting_player()
-        self.none_has_finished = True
+    def __init__(self, bag, board, players, current_player, passes=0):
+        self.bag = bag
+        self.board = board
+        self.players = players
+        self.num_players = len(players)
+        # starting_player = self.determine_starting_player()
+        self.set_current_player(current_player)
+        self.passes = passes
 
-    def determine_starting_player(self):
+    @classmethod
+    def make_new_game(cls, num_players, seed=None):
+        bag = Bag.make_default(seed)
+        board = Board()
+        players = []
+        for _ in range(num_players):
+            players.append(Player.init_from(bag))
+        starting_player = cls.determine_starting_player(players)
+        return cls(bag, board, players, starting_player)
+
+    def get_tiles(self, player):
+        return self.players[player].hand.tiles
+
+    @staticmethod
+    def determine_starting_player(players):
         starting_players = []
-        max_score = 0
-        for player, hand in enumerate(self.hand):
-            score = hand.starting_score()
+        max_score = -math.inf
+        for player in players:
+            score = player.hand.starting_score()
             if score > max_score:
                 starting_players = []
                 max_score = score
@@ -30,32 +66,100 @@ class Game():
         starting_player = random.choice(starting_players)
         return starting_player
 
-    def get_tiles(self, player):
-        return self.hand[player].tiles
-
     def make_move(self, tiles_and_positions):
-        _, tiles = zip(*tiles_and_positions)
-        hand = self.hand[self.current_player]
-        hand.validate_choice(tiles)
-        board_score = self.board.make_move(tiles_and_positions)
-        hand.fill_from(self.bag)
-        score = self._compute_score(hand, board_score)
-        self.scores[self.current_player].append(score)
-        self._advance_player()
-
-    def _compute_score(self, hand, board_score):
-        if hand.is_empty() and self.none_has_finished:
-            # TODO: oone else will have finished.
-            score = board_score + 6
-            self.none_has_finished = False
+        turn = BoardTurn(self.board, self.current_player,
+                         self.bag, tiles_and_positions)
+        try:
+            turn.execute()
+        except EndOfGame:
+            self.end_game()
         else:
-            score = board_score
-        return score
+            self._advance_player()
+            self.passes = 0
 
     def exchange_tiles(self, tiles):
-        self.hand[self.current_player].exchange_tiles(tiles, self.bag)
-        self.scores[self.current_player].append(0)
+        turn = ExchangeTilesTurn(self.current_player, self.bag, tiles)
+        turn.execute()
         self._advance_player()
 
+    def pass_round(self):
+        turn = PassTurn(self.current_player,
+                        self.bag, self.board)
+        turn.execute()
+        self._advance_player()
+        self.passes += 1
+        if self.passes == self.num_players:
+            self.end_game()
+
+    def end_game(self):
+        self.current_player = None
+        self._current_player = None
+        # TODO: Consider end of iteration.
+
     def _advance_player(self):
-        self.current_player = (self.current_player + 1) % self.num_players
+        self._current_player = (self._current_player + 1) % self.num_players
+        self.current_player = self.players[self._current_player]
+
+    def set_current_player(self, player):
+        self._current_player = self.players.index(player)
+        self.current_player = player
+
+
+class BoardTurn():
+    def __init__(self, board, player, bag, tiles_and_positions):
+        self.board = board
+        self.player = player
+        self.bag = bag
+        self.tiles_and_positions = tiles_and_positions
+
+    def execute(self):
+        _, tiles = zip(*self.tiles_and_positions)
+        hand = self.player.hand
+        hand.validate_choice(tiles)
+        board_score = self.board.make_move(self.tiles_and_positions)
+        hand.remove_old_tiles_from_hand(tiles)
+        hand.fill_from(self.bag)
+        self.file_score(board_score)
+
+    def file_score(self, board_score):
+        if self.player.hand.is_empty():
+            score = board_score + 6
+            self.player.score(score)
+            raise EndOfGame()
+        else:
+            self.player.score(board_score)
+
+
+class ExchangeTilesTurn():
+    def __init__(self, player, bag, tiles):
+        self.player = player
+        self.bag = bag
+        self.tiles = tiles
+
+    def execute(self):
+        self.player.hand.exchange_tiles(self.tiles, self.bag)
+        self.player.no_score_turn()
+
+
+class EndOfGame(Exception):
+    pass
+
+
+class PassTurn():
+    def __init__(self, player, bag, board):
+        self.player = player
+        self.bag = bag
+        self.board = board
+
+    def execute(self):
+        if self.cannot_move():
+            self.player.no_score_turn()
+        else:
+            raise IllegalPass()
+
+    def cannot_move(self):
+        return self.bag.is_empty() and len(self.board.legal_moves(self.player.hand)) == 0
+
+
+class IllegalPass(ValueError):
+    pass

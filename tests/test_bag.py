@@ -142,3 +142,13 @@ class TestBag(unittest.TestCase):
             bag.exchange_tiles(tiles)
         self.assertEqual(2, len(bag.tiles))
         self.assertListEqual(bag.tiles, tiles_in_bag)
+
+    def test_is_empty(self):
+        bag = Bag([])
+        result = bag.is_empty()
+        self.assertTrue(result)
+
+    def test_is_not_empty(self):
+        bag = Bag.make_default()
+        result = bag.is_empty()
+        self.assertFalse(result)

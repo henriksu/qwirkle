@@ -39,6 +39,9 @@ class Bag():
         self.tiles = self.tiles[number:]
         return result
 
+    def is_empty(self):
+        return len(self.tiles) == 0
+
 
 class EmptyBagError(ValueError):
     pass

@@ -262,6 +262,48 @@ class TestRowStrikes(unittest.TestCase):
         self.assertFalse(result)
 
 
+class TestColumnStrikes(unittest.TestCase):
+    def setUp(self):
+        tile = Tile(Color.RED, Shape.X)
+        self.board = Board([(Position(0, 0), tile)])
+
+    def test_legal_multi_tile_column(self):
+        tile1 = Tile(Color.RED, Shape.DIAMOND)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
+        result = self.board.is_allowed([(Position(0, 1), tile1),
+                                        (Position(0, 2), tile2)])
+        self.assertTrue(result)
+
+    def test_illegal_multi_tile_column2(self):
+        tile1 = Tile(Color.GREEN, Shape.DIAMOND)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
+        result = self.board.is_allowed([(Position(1, 0), tile1),
+                                        (Position(1, 1), tile2)])
+        self.assertFalse(result)
+
+    def test_illegal_multi_tile_column1(self):
+        tile1 = Tile(Color.GREEN, Shape.DIAMOND)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
+        result = self.board.is_allowed([(Position(0, 1), tile1),
+                                        (Position(0, 2), tile2)])
+        self.assertFalse(result)
+
+
+class TestColumnStrikes2(unittest.TestCase):
+    def setUp(self):
+        tile1 = Tile(Color.RED, Shape.X)
+        tile2 = Tile(Color.RED, Shape.CIRCLE)
+        self.board = Board([(Position(0, 0), tile1),
+                            (Position(0, 1), tile2)])
+
+    def test_illegal_multi_tile_column(self):
+        tile1 = Tile(Color.YELLOW, Shape.X)
+        tile2 = Tile(Color.YELLOW, Shape.CLOVER)
+        result = self.board.is_allowed([(Position(1, 0), tile1),
+                                        (Position(1, 1), tile2)])
+        self.assertFalse(result)
+
+
 class TestMakeMove(unittest.TestCase):
     def test_valid_move(self):
         tile1 = Tile(Color.RED, Shape.X)

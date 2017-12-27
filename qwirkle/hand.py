@@ -17,7 +17,7 @@ class Hand():
         # TODO: Consider 'exchange' -> 'swap'
         self.validate_choice(tiles)
         new_tiles = bag.exchange_tiles(tiles)
-        self._remove_old_tiles_from_hand(tiles)
+        self.remove_old_tiles_from_hand(tiles)
         self.tiles.extend(new_tiles)
 
     def validate_choice(self, chosen_tiles):
@@ -43,7 +43,7 @@ class Hand():
     def is_empty(self):
         return len(self.tiles) == 0
 
-    def _remove_old_tiles_from_hand(self, old_tiles):
+    def remove_old_tiles_from_hand(self, old_tiles):
         for tile in old_tiles:
             self.tiles.remove(tile)
 
