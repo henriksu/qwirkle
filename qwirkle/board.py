@@ -177,16 +177,16 @@ class Move():
         self.combined_tiles_and_position = self.board.tiles + self.tiles_and_positions
         self.combined_positions = list(zip(*self.combined_tiles_and_position))[0]
         if self.all_same_column():
-            if not self.verify_row_strike(self.positions[0]):
-                return False
-            for position, _ in self.tiles_and_positions:
-                if not self.verify_column_strike(position):
-                    return False
-        else:  # All same row.
             if not self.verify_column_strike(self.positions[0]):
                 return False
             for position, _ in self.tiles_and_positions:
                 if not self.verify_row_strike(position):
+                    return False
+        else:  # All same row.
+            if not self.verify_row_strike(self.positions[0]):
+                return False
+            for position, _ in self.tiles_and_positions:
+                if not self.verify_column_strike(position):
                     return False
         return True
 
