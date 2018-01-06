@@ -344,5 +344,47 @@ class TestMakeMove(unittest.TestCase):
         self.assertEqual(12, score)
 
 
+class TestMovesWithNonUniquePositions(unittest.TestCase):
+    def testRepeatedMovePosition(self):
+        tile1 = Tile(Color.RED, Shape.CIRCLE)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
+        board = Board()
+        move = [(Position(0, 0), tile1),
+                (Position(0, 0), tile2)]
+        result = board.is_allowed(move)
+        self.assertFalse(result)
+
+    def testMoveOvershadowsExistingTile(self):
+        tile1 = Tile(Color.RED, Shape.CIRCLE)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
+        board = Board([(Position(0, 0), tile1),
+                       (Position(0, 1), tile2)])
+        tile1 = Tile(Color.RED, Shape.DIAMOND)
+        tile2 = Tile(Color.RED, Shape.SQUARE)
+        move = [(Position(0, 1), tile1),
+                (Position(1, 1), tile2)]
+        result = board.is_allowed(move)
+        self.assertFalse(result)
+
+
+class TestGetColumnStrike(unittest.TestCase):
+    def test_second_column_strike(self):
+        tile1 = Tile(Color.RED, Shape.CIRCLE)
+        tile2 = Tile(Color.RED, Shape.CLOVER)
+        tile3 = Tile(Color.RED, Shape.DIAMOND)
+        tile4 = Tile(Color.RED, Shape.CLOVER)
+        placements = [(Position(0, 1), tile1),
+                      (Position(0, 0), tile2),
+                      (Position(0, -1), tile3),
+                      (Position(1, -1), tile4)]
+        board = Board(placements)
+        tile5 = Tile(Color.RED, Shape.CLOVER)
+        tile6 = Tile(Color.RED, Shape.CIRCLE)
+        move = [(Position(1, 1), tile5),
+                (Position(1, 2), tile6)]
+        result = board.is_allowed(move)
+        self.assertTrue(result)
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -122,7 +122,7 @@ class TestPassTurn(unittest.TestCase):
         tiles = [Tile(Color.RED, Shape.CIRCLE)]
         self.assertListEqual(tiles, player1.hand.tiles)
         self.assertEqual(1, game.passes)
-        self.assertEquals(player2, game.current_player)
+        self.assertEqual(player2, game.current_player)
 
     def test_pass_and_end_game(self):
         tiles = [Tile(Color.RED, Shape.CIRCLE)]

@@ -55,22 +55,20 @@ class Hand():
         # TODO: Check that the counting eliminates duplicates.
         # TODO: Suboptimal number of iterations.
         # Consider using bins instead.
-        max_score = 0
-        for color in Color:
-            common = filter(lambda t: t.color == color,
-                            self.tiles)
-            score = len(set(common))
-            max_score = max(max_score, score)
-        return max_score
+        scores = map(self.color_score, Color)
+        return max(scores)
+
+    def color_score(self, color):
+        common = filter(lambda t: t.color == color, self.tiles)
+        return len(set(common))
 
     def starting_score_shape(self):
-        max_score = 0
-        for shape in Shape:
-            common = filter(lambda t: t.shape == shape,
-                            self.tiles)
-            score = len(set(common))
-            max_score = max(max_score, score)
-        return max_score
+        scores = map(self.shape_score, Shape)
+        return max(scores)
+
+    def shape_score(self, shape):
+        common = filter(lambda t: t.shape == shape, self.tiles)
+        return len(set(common))
 
 
 class NonMoveError(ValueError):

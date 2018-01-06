@@ -112,8 +112,9 @@ class Move():
             self.is_compatible_with_surrounding_tiles()
 
     def unique_positions(self):
-        # TODO: Check that new positions don't coincide with old ones.
-        return len(self.positions) == len(set(self.positions))
+        tmp = set(self.board.positions) & set(self.positions)
+        return (len(tmp) == 0) and \
+            len(self.positions) == len(set(self.positions))
 
     def is_connected(self):
         if self.is_first_move():
