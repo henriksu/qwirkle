@@ -83,9 +83,9 @@ def main():
     
     game = Game.make_new_game(1, 42)   
     mainBoard = game.board.tiles
-    currentHand = game.current_player.hand.tiles
+    
     currentSelectedTile = None
-    currentPlacedTile = None
+    currentPlacedTiles = []
 
     DISPLAYSURF.fill(BGCOLOR)    
     
@@ -106,6 +106,9 @@ def main():
             elif event.type == MOUSEBUTTONUP:
                 mousex, mousey = event.pos
                 mouseClicked = True
+        
+        #Update the current hand of the current player
+        currentHand = game.current_player.hand.tiles
                 
         #Draw the player hand area
         boxx = WINDOWWIDTH/2 - (BOXSIZE*3 + GAPSIZE*4)
@@ -138,7 +141,7 @@ def main():
             
         #Highlight the possible next move when mouse is hovering over it and mark it as possible move
         possibleMove = False
-        if not mainBoard: #if there are no Tiles in mainBoard yet, highlight the first possible move
+        if not mainBoard and not currentPlacedTiles: #if there are no Tiles in mainBoard yet, highlight the first possible move
             x = WINDOWWIDTH/2 - BOXSIZE/2 
             y = WINDOWHEIGHT/2 - BOXSIZE/2
             boxRect = pygame.Rect(x, y, BOXSIZE, BOXSIZE)
@@ -150,18 +153,33 @@ def main():
             boxx, boxy = getTileAtPixel(mousex, mousey)
             
             if boxx != None:
-                for pos, tile in mainBoard:
-                    if pos == (boxx, boxy):
-                        possibleMove = False
-                        break
-                    elif pos[0] == boxx and pos[1] == boxy+1:
-                        possibleMove = True
-                    elif pos[0] == boxx and pos[1] == boxy-1:
-                        possibleMove = True
-                    elif pos[0] == boxx+1 and pos[1] == boxy:
-                        possibleMove = True
-                    elif pos[0] == boxx-1 and pos[1] == boxy:
-                        possibleMove = True
+                if currentPlacedTiles:
+                    for pos, placedTile in  currentPlacedTiles:
+                        if pos == (boxx, boxy):
+                            possibleMove = False
+                            break
+                        elif pos[0] == boxx and pos[1] == boxy+1:
+                            possibleMove = True
+                        elif pos[0] == boxx and pos[1] == boxy-1:
+                            possibleMove = True
+                        elif pos[0] == boxx+1 and pos[1] == boxy:
+                            possibleMove = True
+                        elif pos[0] == boxx-1 and pos[1] == boxy:
+                            possibleMove = True
+                else:
+                    for pos, tile in mainBoard:
+                        if pos == (boxx, boxy):
+                            possibleMove = False
+                            break
+                        elif pos[0] == boxx and pos[1] == boxy+1:
+                            possibleMove = True
+                        elif pos[0] == boxx and pos[1] == boxy-1:
+                            possibleMove = True
+                        elif pos[0] == boxx+1 and pos[1] == boxy:
+                            possibleMove = True
+                        elif pos[0] == boxx-1 and pos[1] == boxy:
+                            possibleMove = True
+                
                 
                 if possibleMove:
                     x = WINDOWWIDTH/2 - BOXSIZE/2 + boxx*BOXSIZE + boxx*GAPSIZE
@@ -172,15 +190,16 @@ def main():
             
         #if a possible move is selected, and a tile is selected, draw the current tile there
         if possibleMove and mouseClicked and (currentSelectedTile != None):
-            currentPlacedTile = getTileAtPixel(mousex, mousey), currentSelectedTile
+            currentPlacedTiles.append([getTileAtPixel(mousex, mousey), currentSelectedTile])
+            currentSelectedTile = None
             
-        if currentPlacedTile != None:
-            (tilex, tiley), (tile, x, y) = currentPlacedTile
-            #This is to highlight the newly placed tile
-            x, y = leftTopCoordsOfBox(tilex, tiley) 
-            pygame.draw.rect(DISPLAYSURF,YELLOW, (x - GAPSIZE/2 , y - GAPSIZE/2, BOXSIZE + GAPSIZE, BOXSIZE + GAPSIZE))
-            #Draw the actual tile
-            drawBoardTile(tile, tilex,  tiley)
+        if currentPlacedTiles:
+            for (tilex, tiley), (tile, x, y)  in currentPlacedTiles:
+                #This is to highlight the newly placed tile
+                x, y = leftTopCoordsOfBox(tilex, tiley)
+                pygame.draw.rect(DISPLAYSURF,YELLOW, (x - GAPSIZE/2 , y - GAPSIZE/2, BOXSIZE + GAPSIZE, BOXSIZE + GAPSIZE)) #Draw the highlight around the tile
+                drawBoardTile(tile, tilex,  tiley) #Draw the actual tile
+                    
             
         #Draw current player name by the hand selection
         
@@ -202,14 +221,18 @@ def main():
             MOVE_SURF, MOVE_RECT = makeText('End Move', BUTTONTEXTCOLOR, BUTTONCOLOR, WINDOWWIDTH - 150, WINDOWHEIGHT - 75)
 
         #Finish the move when pressing on MOVE button
+        tiles_and_positions = []
         if MOVE_RECT.collidepoint(mousex, mousey) and mouseClicked:
-            if currentPlacedTile != None:
-                (tilex, tiley), (tile, x, y) = currentPlacedTile
-                tiles_and_positions = [(Position(tilex, tiley), tile)]
-                game.make_move(tiles_and_positions)
-                currentPlacedTile = None
+            if currentPlacedTiles:
+                for (tilex, tiley), (tile, x, y)  in currentPlacedTiles:
+                    tiles_and_positions.append([Position(tilex, tiley), tile])
+                try:
+                    game.make_move(tiles_and_positions)
+                except ValueError:
+                    pass
+                currentPlacedTiles = []
                 currentSelectedTile = None
-
+                
         # Redraw the screen and wait a clock tick.
         pygame.display.update()
         FPSCLOCK.tick(FPS)
