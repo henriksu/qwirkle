@@ -69,22 +69,26 @@ def main():
     BASICFONTSIZE = 20
     BASICFONT = pygame.font.Font('freesansbold.ttf', BASICFONTSIZE)
     BUTTONCOLOR = WHITE
+    BUTTONCOLOR_HOVER = BLACK
     BUTTONTEXTCOLOR = BLACK
+    BUTTONTEXTCOLOR_HOVER = GRAY
     MESSAGECOLOR = WHITE
     TEXTCOLOR = BLACK
     BASICFONTSIZE = 20
     
-    # Store the option buttons and their rectangles in OPTIONS.
-    MOVE_SURF, MOVE_RECT = makeText('End Move', BUTTONTEXTCOLOR, BUTTONCOLOR, WINDOWWIDTH - 150, WINDOWHEIGHT - 75)
+    #Buttons
+    MOVE_SURF, MOVE_RECT = makeText('End Move', BUTTONTEXTCOLOR, BUTTONTEXTCOLOR, WINDOWWIDTH - 150, WINDOWHEIGHT - 75)
+    REGRET_SURF, REGRET_RECT = makeText('Regret', BUTTONTEXTCOLOR, BUTTONCOLOR, WINDOWWIDTH - 150, WINDOWHEIGHT - 50)
+    SWAP_SURF, SWAP_RECT = makeText('Swap', BUTTONTEXTCOLOR, BUTTONCOLOR, WINDOWWIDTH - 150, WINDOWHEIGHT - 25)
 
     mousex = 0 # used to store x coordinate of mouse event
     mousey = 0 # used to store y coordinate of mouse event
     pygame.display.set_caption('Qwirkle')
     
-    game = Game.make_new_game(1, 42)   
+    game = Game.make_new_game(4, 42)   
     mainBoard = game.board.tiles
     
-    currentSelectedTile = None
+    currentSelectedTiles = []
     currentPlacedTiles = []
 
     DISPLAYSURF.fill(BGCOLOR)    
@@ -95,8 +99,18 @@ def main():
         DISPLAYSURF.fill(BGCOLOR) # drawing the window
         
         #Update the Statistics
-        SCORE_SURF, SCORE_RECT = makeText('Score: '  + str(game.current_player.total_score()), TEXTCOLOR, MESSAGECOLOR, WINDOWWIDTH - 150, 25)
-
+        playernr = 1
+        for player in game.players:
+            scoreText = 'Player ' + str(playernr) + ': ' + str(player.total_score())
+            if player == game.current_player:
+                txtColor = GREEN
+            else:
+                txtColor = TEXTCOLOR
+            
+            SCORE_SURF, SCORE_RECT = makeText(scoreText, txtColor, MESSAGECOLOR, WINDOWWIDTH - 125, 25 * playernr)
+            DISPLAYSURF.blit(SCORE_SURF, SCORE_RECT) #Draw statistics of names and scores on top right corner
+            playernr += 1
+    
         for event in pygame.event.get(): # event handling loop
             if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
                 pygame.quit()
@@ -117,14 +131,20 @@ def main():
         
         #Highlight the hand tile the mouse is hovering over and select if mousebutton is selected
         hoverTile = getHandTileAtPixel(mousex, mousey, currentHand)
+        tileSelected = False
         if mouseClicked:
             if hoverTile != None:
-                currentSelectedTile = hoverTile
+                for tile, x, y in currentSelectedTiles:
+                    if hoverTile == (tile, x, y):
+                        tileSelected = True
+                        currentSelectedTiles.remove((tile, x, y))
+                if not tileSelected:
+                        currentSelectedTiles.append(hoverTile)
         
         #Highlight the currently selected tile in the hand
-        if currentSelectedTile != None:
-            tile, x, y = currentSelectedTile
-            pygame.draw.rect(DISPLAYSURF,BLUE, (x - GAPSIZE/2, y - GAPSIZE/2, BOXSIZE + GAPSIZE, BOXSIZE + GAPSIZE))
+        if currentSelectedTiles:
+            for tile, x, y in currentSelectedTiles:
+                pygame.draw.rect(DISPLAYSURF,BLUE, (x - GAPSIZE/2, y - GAPSIZE/2, BOXSIZE + GAPSIZE, BOXSIZE + GAPSIZE))
         
         #Draw the player hand
         space = 0
@@ -133,6 +153,16 @@ def main():
             y = WINDOWHEIGHT - BOXSIZE*1.1
             drawTile(tile, x, y, BOXSIZE)            
             space = space + BOXSIZE + GAPSIZE
+        
+        #Hide the currently placed tiles from the hand
+        for pos, (currentPlacedTile, x, y) in currentPlacedTiles:
+            space = 0
+            for tile in currentHand:
+                if tile == currentPlacedTile:
+                    x = WINDOWWIDTH/2 - (BOXSIZE+GAPSIZE)*3 + space
+                    y = WINDOWHEIGHT - BOXSIZE*1.1
+                    pygame.draw.rect(DISPLAYSURF,WHITE, (x, y, BOXSIZE, BOXSIZE)) 
+                space = space + BOXSIZE + GAPSIZE    
         
         #Draw the board
         for pos, tile in mainBoard:
@@ -189,9 +219,12 @@ def main():
                         pygame.draw.rect(DISPLAYSURF,WHITE, (x, y, BOXSIZE, BOXSIZE))
             
         #if a possible move is selected, and a tile is selected, draw the current tile there
-        if possibleMove and mouseClicked and (currentSelectedTile != None):
-            currentPlacedTiles.append([getTileAtPixel(mousex, mousey), currentSelectedTile])
-            currentSelectedTile = None
+        if possibleMove and mouseClicked and currentSelectedTiles:
+            for tile, x, y in currentSelectedTiles:
+                currentPlacedTiles.append([getTileAtPixel(mousex, mousey), (tile, x, y)])
+                currentSelectedTiles.remove((tile, x, y))
+                break
+                
             
         if currentPlacedTiles:
             for (tilex, tiley), (tile, x, y)  in currentPlacedTiles:
@@ -203,23 +236,56 @@ def main():
             
         #Draw current player name by the hand selection
         
-        #Draw statistics of names and scores on top right corner
-        DISPLAYSURF.blit(SCORE_SURF, SCORE_RECT)
-        
-        #Draw button
+        #Draw buttons
         DISPLAYSURF.blit(MOVE_SURF, MOVE_RECT)
         
         #Highlight button if mouse is over it
         if MOVE_RECT.collidepoint(mousex, mousey):
-            if BUTTONTEXTCOLOR == BLACK:
-                BUTTONTEXTCOLOR = GRAY
-                BUTTONCOLOR = BLACK
-                MOVE_SURF, MOVE_RECT = makeText('End Move', BUTTONTEXTCOLOR, BUTTONCOLOR, WINDOWWIDTH - 150, WINDOWHEIGHT - 75)
-        elif BUTTONTEXTCOLOR == GRAY:
-            BUTTONTEXTCOLOR = BLACK
-            BUTTONCOLOR = WHITE
-            MOVE_SURF, MOVE_RECT = makeText('End Move', BUTTONTEXTCOLOR, BUTTONCOLOR, WINDOWWIDTH - 150, WINDOWHEIGHT - 75)
-
+            moveButtonTextColor = BUTTONTEXTCOLOR_HOVER
+            moveButtonColor = BUTTONCOLOR_HOVER
+        else:
+            moveButtonTextColor = BUTTONTEXTCOLOR
+            moveButtonColor = BUTTONCOLOR 
+        
+        if REGRET_RECT.collidepoint(mousex, mousey):
+            regretButtonTextColor = BUTTONTEXTCOLOR_HOVER
+            regretButtonColor = BUTTONCOLOR_HOVER
+        else:
+            regretButtonTextColor = BUTTONTEXTCOLOR
+            regretButtonColor = BUTTONCOLOR 
+            
+        if SWAP_RECT.collidepoint(mousex, mousey):
+            swapButtonTextColor = BUTTONTEXTCOLOR_HOVER
+            swapButtonColor = BUTTONCOLOR_HOVER
+        else:
+            swapButtonTextColor = BUTTONTEXTCOLOR
+            swapButtonColor = BUTTONCOLOR 
+        
+        
+        #Update Buttons
+        MOVE_SURF, MOVE_RECT = makeText('End Move', moveButtonTextColor, moveButtonColor, WINDOWWIDTH - 150, WINDOWHEIGHT - 75)
+        REGRET_SURF, REGRET_RECT = makeText('Regret', regretButtonTextColor, regretButtonColor, WINDOWWIDTH - 150, WINDOWHEIGHT - 50)
+        SWAP_SURF, SWAP_RECT = makeText('Swap', swapButtonTextColor, swapButtonColor, WINDOWWIDTH - 150, WINDOWHEIGHT - 25)
+        
+        #Draw Buttons
+        DISPLAYSURF.blit(MOVE_SURF, MOVE_RECT)
+        DISPLAYSURF.blit(REGRET_SURF, REGRET_RECT)
+        DISPLAYSURF.blit(SWAP_SURF, SWAP_RECT)
+       
+        
+        #Swap selected tile when pressing on SWAP button
+        if SWAP_RECT.collidepoint(mousex, mousey) and mouseClicked and currentSelectedTiles:
+            tiles = []
+            for tile, x, y in currentSelectedTiles:
+                tiles.append(tile)
+            game.exchange_tiles(tiles)
+            currentSelectedTiles = []
+        
+        #Empty the currentPlacedTiles list when you press Regret
+        if REGRET_RECT.collidepoint(mousex, mousey) and mouseClicked and currentPlacedTiles:
+            currentPlacedTiles = []
+            currentSelectedTiles = []
+        
         #Finish the move when pressing on MOVE button
         tiles_and_positions = []
         if MOVE_RECT.collidepoint(mousex, mousey) and mouseClicked:
@@ -231,7 +297,7 @@ def main():
                 except ValueError:
                     pass
                 currentPlacedTiles = []
-                currentSelectedTile = None
+                currentSelectedTiles = []
                 
         # Redraw the screen and wait a clock tick.
         pygame.display.update()
