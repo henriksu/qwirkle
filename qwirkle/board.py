@@ -64,11 +64,16 @@ class Board():
 
     def legal_moves(self, hand):
         moves = set()
-        for pos in self.adjacent_positions():
+        if len(self.positions) == 0:
+            positions = [Position(0, 0)]
+        else:
+            positions = self.adjacent_positions()
+        for pos in positions:
             for tile in hand.tiles:
                 move = Move(self, [(pos, tile)])
                 if move.is_allowed():
                     moves.add(move)
+            # TODO: No multi-tile move considered. FIX? not needed for determining legality of passes.
         return moves
 
     def adjacent_positions(self):
