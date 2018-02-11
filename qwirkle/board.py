@@ -46,12 +46,7 @@ class Board():
             self._add_to_board(tiles_and_positions)
             return score
         else:
-            raise ValueError()
-            # TODO: Let a level closer to GUI expect this error.
-            # It is not the boards responsibility to expect clumsy players,
-            # and besides if the player is an AI, the error will have to be
-            # dealt with very differently.
-            # TODO: Subclass ValueError.
+            raise IllegalMoveError()
 
     def _add_to_board(self, tiles_and_positions):
         # Placeholder in case of more elaborate data structures.
@@ -66,6 +61,27 @@ class Board():
         pos = filter(lambda pos: pos.x == column, self.positions)
         existing_indexes = map(lambda p: p.y, pos)
         return existing_indexes
+
+    def legal_moves(self, hand):
+        moves = set()
+        for pos in self.adjacent_positions():
+            for tile in hand.tiles:
+                move = Move(self, [(pos, tile)])
+                if move.is_allowed():
+                    moves.add(move)
+        return moves
+
+    def adjacent_positions(self):
+        marked = set()
+        for pos in self.positions:
+            for neigh in pos.neighbour_positions():
+                if (neigh not in self.positions) and (neigh not in marked):
+                    marked.add(neigh)
+                    yield neigh
+
+
+class IllegalMoveError(ValueError):
+    pass
 
 
 class Move():
