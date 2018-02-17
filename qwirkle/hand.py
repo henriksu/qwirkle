@@ -44,6 +44,7 @@ class Hand():
         return len(self.tiles) == 0
 
     def remove_old_tiles_from_hand(self, old_tiles):
+        old_tiles = copy(old_tiles)
         for tile in old_tiles:
             self.tiles.remove(tile)
 
