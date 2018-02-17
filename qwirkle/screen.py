@@ -45,6 +45,16 @@ LIGHTBGCOLOR = GRAY
 BOXCOLOR = WHITE
 HIGHLIGHTCOLOR = BLUE
 
+BASICFONTSIZE = 20
+BUTTONCOLOR = WHITE
+BUTTONCOLOR_HOVER = BLACK
+BUTTONTEXTCOLOR = BLACK
+BUTTONTEXTCOLOR_HOVER = GRAY
+MESSAGECOLOR = WHITE
+TEXTCOLOR = BLACK
+BASICFONTSIZE = 20
+
+
 CIRCLE = 'circle'
 X = 'X'
 DIAMOND = 'diamond'
@@ -58,23 +68,25 @@ ALLSHAPES = (CIRCLE, X, DIAMOND, SQUARE, STAR, CLOVER)
 
 assert len(ALLCOLORS) * len(ALLSHAPES) * 2 >= BOARDWIDTH * BOARDHEIGHT, "Board is too big for the number of shapes/colors defined."
 
+
+
+
+
+def draw_board(mainBoard):
+    '''Draw the tiles already placed on the board.'''
+    for pos, tile in mainBoard:
+        tilex, tiley = pos
+        drawBoardTile(tile, tilex, tiley)
+
 def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, MOVE_SURF, MOVE_RECT
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, MOVE_SURF, MOVE_RECT, BOXSIZE, GAPSIZE
     
     pygame.init()
     
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-    
-    BASICFONTSIZE = 20
+
     BASICFONT = pygame.font.Font('freesansbold.ttf', BASICFONTSIZE)
-    BUTTONCOLOR = WHITE
-    BUTTONCOLOR_HOVER = BLACK
-    BUTTONTEXTCOLOR = BLACK
-    BUTTONTEXTCOLOR_HOVER = GRAY
-    MESSAGECOLOR = WHITE
-    TEXTCOLOR = BLACK
-    BASICFONTSIZE = 20
     
     #Buttons
     MOVE_SURF, MOVE_RECT = makeText('End Move', BUTTONTEXTCOLOR, BUTTONTEXTCOLOR, WINDOWWIDTH - 150, WINDOWHEIGHT - 75)
@@ -85,7 +97,7 @@ def main():
     mousey = 0 # used to store y coordinate of mouse event
     pygame.display.set_caption('Qwirkle')
     
-    game = Game.make_new_game(4, 42)   
+    game = Game.make_new_game(2, 42)   
     mainBoard = game.board.tiles
     
     currentSelectedTiles = []
@@ -94,23 +106,8 @@ def main():
     DISPLAYSURF.fill(BGCOLOR)    
     
     while True: # main game loop
+       
         mouseClicked = False
-
-        DISPLAYSURF.fill(BGCOLOR) # drawing the window
-        
-        #Update the Statistics
-        playernr = 1
-        for player in game.players:
-            scoreText = 'Player ' + str(playernr) + ': ' + str(player.total_score())
-            if player == game.current_player:
-                txtColor = GREEN
-            else:
-                txtColor = TEXTCOLOR
-            
-            SCORE_SURF, SCORE_RECT = makeText(scoreText, txtColor, MESSAGECOLOR, WINDOWWIDTH - 125, 25 * playernr)
-            DISPLAYSURF.blit(SCORE_SURF, SCORE_RECT) #Draw statistics of names and scores on top right corner
-            playernr += 1
-    
         for event in pygame.event.get(): # event handling loop
             if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
                 pygame.quit()
@@ -120,119 +117,18 @@ def main():
             elif event.type == MOUSEBUTTONUP:
                 mousex, mousey = event.pos
                 mouseClicked = True
-        
-        #Update the current hand of the current player
-        currentHand = game.current_player.hand.tiles
+        mouse_state = dict(x=mousex,
+                           y=mousey,
+                           clicked=mouseClicked)
                 
-        #Draw the player hand area
-        boxx = WINDOWWIDTH/2 - (BOXSIZE*3 + GAPSIZE*4)
-        boxy = WINDOWHEIGHT - BOXSIZE*1.1 - GAPSIZE
-        pygame.draw.rect(DISPLAYSURF,WHITE, (boxx, boxy, (BOXSIZE+GAPSIZE)*6+ GAPSIZE, BOXSIZE*2))
+        DISPLAYSURF.fill(BGCOLOR) # drawing the window
+
+        currentHand = game.current_player.hand.tiles  #Update the current hand of the current player
         
-        #Highlight the hand tile the mouse is hovering over and select if mousebutton is selected
-        hoverTile = getHandTileAtPixel(mousex, mousey, currentHand)
-        tileSelected = False
-        if mouseClicked:
-            if hoverTile != None:
-                for tile, x, y in currentSelectedTiles:
-                    if hoverTile == (tile, x, y):
-                        tileSelected = True
-                        currentSelectedTiles.remove((tile, x, y))
-                if not tileSelected:
-                        currentSelectedTiles.append(hoverTile)
-        
-        #Highlight the currently selected tile in the hand
-        if currentSelectedTiles:
-            for tile, x, y in currentSelectedTiles:
-                pygame.draw.rect(DISPLAYSURF,BLUE, (x - GAPSIZE/2, y - GAPSIZE/2, BOXSIZE + GAPSIZE, BOXSIZE + GAPSIZE))
-        
-        #Draw the player hand
-        space = 0
-        for tile in currentHand:
-            x = WINDOWWIDTH/2 - (BOXSIZE+GAPSIZE)*3 + space
-            y = WINDOWHEIGHT - BOXSIZE*1.1
-            drawTile(tile, x, y, BOXSIZE)            
-            space = space + BOXSIZE + GAPSIZE
-        
-        #Hide the currently placed tiles from the hand
-        for pos, (currentPlacedTile, x, y) in currentPlacedTiles:
-            space = 0
-            for tile in currentHand:
-                if tile == currentPlacedTile:
-                    x = WINDOWWIDTH/2 - (BOXSIZE+GAPSIZE)*3 + space
-                    y = WINDOWHEIGHT - BOXSIZE*1.1
-                    pygame.draw.rect(DISPLAYSURF,WHITE, (x, y, BOXSIZE, BOXSIZE)) 
-                space = space + BOXSIZE + GAPSIZE    
-        
-        #Draw the board
-        for pos, tile in mainBoard:
-            tilex, tiley = pos
-            drawBoardTile(tile, tilex, tiley)
-            
-        #Highlight the possible next move when mouse is hovering over it and mark it as possible move
-        possibleMove = False
-        if not mainBoard and not currentPlacedTiles: #if there are no Tiles in mainBoard yet, highlight the first possible move
-            x = WINDOWWIDTH/2 - BOXSIZE/2 
-            y = WINDOWHEIGHT/2 - BOXSIZE/2
-            boxRect = pygame.Rect(x, y, BOXSIZE, BOXSIZE)
-            if boxRect.collidepoint(mousex, mousey):
-                possibleMove = True        
-                pygame.draw.rect(DISPLAYSURF,WHITE, (x, y, BOXSIZE, BOXSIZE))
-        else:
-            #Check if there is an empty tile spot next to a real tile
-            boxx, boxy = getTileAtPixel(mousex, mousey)
-            
-            if boxx != None:
-                if currentPlacedTiles:
-                    for pos, placedTile in  currentPlacedTiles:
-                        if pos == (boxx, boxy):
-                            possibleMove = False
-                            break
-                        elif pos[0] == boxx and pos[1] == boxy+1:
-                            possibleMove = True
-                        elif pos[0] == boxx and pos[1] == boxy-1:
-                            possibleMove = True
-                        elif pos[0] == boxx+1 and pos[1] == boxy:
-                            possibleMove = True
-                        elif pos[0] == boxx-1 and pos[1] == boxy:
-                            possibleMove = True
-                else:
-                    for pos, tile in mainBoard:
-                        if pos == (boxx, boxy):
-                            possibleMove = False
-                            break
-                        elif pos[0] == boxx and pos[1] == boxy+1:
-                            possibleMove = True
-                        elif pos[0] == boxx and pos[1] == boxy-1:
-                            possibleMove = True
-                        elif pos[0] == boxx+1 and pos[1] == boxy:
-                            possibleMove = True
-                        elif pos[0] == boxx-1 and pos[1] == boxy:
-                            possibleMove = True
-                
-                
-                if possibleMove:
-                    x = WINDOWWIDTH/2 - BOXSIZE/2 + boxx*BOXSIZE + boxx*GAPSIZE
-                    y = WINDOWHEIGHT/2 - BOXSIZE/2 + boxy*BOXSIZE + boxy*GAPSIZE
-                    if y < (WINDOWHEIGHT - BOXSIZE*3):  #This is so that it is not possible to make a move 
-                                                        #across the hadn area
-                        pygame.draw.rect(DISPLAYSURF,WHITE, (x, y, BOXSIZE, BOXSIZE))
-            
-        #if a possible move is selected, and a tile is selected, draw the current tile there
-        if possibleMove and mouseClicked and currentSelectedTiles:
-            for tile, x, y in currentSelectedTiles:
-                currentPlacedTiles.append([getTileAtPixel(mousex, mousey), (tile, x, y)])
-                currentSelectedTiles.remove((tile, x, y))
-                break
-                
-            
-        if currentPlacedTiles:
-            for (tilex, tiley), (tile, x, y)  in currentPlacedTiles:
-                #This is to highlight the newly placed tile
-                x, y = leftTopCoordsOfBox(tilex, tiley)
-                pygame.draw.rect(DISPLAYSURF,YELLOW, (x - GAPSIZE/2 , y - GAPSIZE/2, BOXSIZE + GAPSIZE, BOXSIZE + GAPSIZE)) #Draw the highlight around the tile
-                drawBoardTile(tile, tilex,  tiley) #Draw the actual tile
-                    
+        draw_hand(currentHand, mouse_state, currentSelectedTiles, currentPlacedTiles)
+        draw_score(DISPLAYSURF, game)
+        draw_board(mainBoard)
+        highlight_possible_placement(mainBoard, mouse_state, currentSelectedTiles, currentPlacedTiles, BOXSIZE, GAPSIZE)
             
         #Draw current player name by the hand selection
         
@@ -299,9 +195,134 @@ def main():
                 currentPlacedTiles = []
                 currentSelectedTiles = []
                 
+        
+                
         # Redraw the screen and wait a clock tick.
         pygame.display.update()
         FPSCLOCK.tick(FPS)
+
+
+def check_possible_placement(tiles, tile_x, tile_y):
+    possibleMove = False
+    for pos, _ in tiles:
+        if pos == (tile_x, tile_y):
+            possibleMove = False
+            break
+        elif pos[0] == tile_x and pos[1] == tile_y + 1:
+            possibleMove = True
+        elif pos[0] == tile_x and pos[1] == tile_y - 1:
+            possibleMove = True
+        elif pos[0] == tile_x + 1 and pos[1] == tile_y:
+            possibleMove = True
+        elif pos[0] == tile_x - 1 and pos[1] == tile_y:
+            possibleMove = True 
+    return possibleMove
+
+def highlight_possible_placement(mainBoard, mouse_state, current_selected_tiles, current_placed_tiles, BOXSIZE, GAPSIZE):
+    '''Highlight the possible next move when mouse is hovering over it and mark it as possible move'''
+    possibleMove = False
+    if not mainBoard and not current_placed_tiles: #if there are no Tiles in mainBoard yet, highlight the first possible move
+        x = WINDOWWIDTH/2 - BOXSIZE/2 
+        y = WINDOWHEIGHT/2 - BOXSIZE/2
+        boxRect = pygame.Rect(x, y, BOXSIZE, BOXSIZE)
+        if boxRect.collidepoint(mouse_state['x'], mouse_state['y']):
+            possibleMove = True        
+            pygame.draw.rect(DISPLAYSURF,WHITE, (x, y, BOXSIZE, BOXSIZE))
+    else:
+        #Check if there is an empty tile spot next to a real tile
+        boxx, boxy = getTileAtPixel(mouse_state['x'], mouse_state['y'])
+        
+        if boxx != None:
+            if current_placed_tiles:
+                possibleMove = check_possible_placement(current_placed_tiles, boxx, boxy)
+            else:
+                possibleMove = check_possible_placement(mainBoard, boxx, boxy)
+            
+            if possibleMove:
+                x = WINDOWWIDTH/2 - BOXSIZE/2 + boxx*BOXSIZE + boxx*GAPSIZE
+                y = WINDOWHEIGHT/2 - BOXSIZE/2 + boxy*BOXSIZE + boxy*GAPSIZE
+                if y < (WINDOWHEIGHT - BOXSIZE*3):  #This is so that it is not possible to make a move 
+                                                    #across the hadn area
+                    pygame.draw.rect(DISPLAYSURF,WHITE, (x, y, BOXSIZE, BOXSIZE))
+                    
+                #If the board becomes bigger than the screen, shrink the tiles
+                if x > (WINDOWWIDTH - (BOXSIZE)) or x < (BOXSIZE) or y > (WINDOWHEIGHT - (BOXSIZE*3)) or y < (BOXSIZE):
+                    BOXSIZE = BOXSIZE*0.99
+                    GAPSIZE = GAPSIZE*0.99
+    #if a possible move is selected, and a tile is selected, draw the current tile there
+    if possibleMove and mouse_state['clicked'] and current_selected_tiles:
+        for tile, x, y in current_selected_tiles:
+            current_placed_tiles.append([getTileAtPixel(mouse_state['x'], mouse_state['y']), (tile, x, y)])
+            current_selected_tiles.remove((tile, x, y))
+            break
+            
+        
+    if current_placed_tiles:
+        for (tilex, tiley), (tile, x, y)  in current_placed_tiles:
+            #This is to highlight the newly placed tile
+            x, y = leftTopCoordsOfBox(tilex, tiley)
+            pygame.draw.rect(DISPLAYSURF,YELLOW, (x - GAPSIZE/2 , y - GAPSIZE/2, BOXSIZE + GAPSIZE, BOXSIZE + GAPSIZE)) #Draw the highlight around the tile
+            drawBoardTile(tile, tilex,  tiley) #Draw the actual tile
+
+def draw_hand(hand, mouse_state, currentSelectedTiles, currentPlacedTiles):
+    #Draw the player hand area
+    boxx = WINDOWWIDTH/2 - (BOXSIZE*3 + GAPSIZE*4)
+    boxy = WINDOWHEIGHT - BOXSIZE*1.1 - GAPSIZE
+    pygame.draw.rect(DISPLAYSURF,WHITE, (boxx, boxy, (BOXSIZE+GAPSIZE)*6+ GAPSIZE, BOXSIZE*2))
+    
+    #Highlight the hand tile the mouse is hovering over and select if mousebutton is selected
+    hoverTile = getHandTileAtPixel(mouse_state['x'], mouse_state['y'], hand)
+    tileSelected = False
+    if mouse_state['clicked']:
+        if hoverTile != None:
+            for tile, x, y in currentSelectedTiles:
+                if hoverTile == (tile, x, y):
+                    tileSelected = True
+                    currentSelectedTiles.remove((tile, x, y))
+            if not tileSelected:
+                    currentSelectedTiles.append(hoverTile)
+    
+    #Highlight the currently selected tiles in the hand
+    if currentSelectedTiles:
+        for currentTile, x, y in currentSelectedTiles:
+            space = 0
+            for tile in hand:
+                if tile == currentTile:
+                    x = WINDOWWIDTH/2 - (BOXSIZE+GAPSIZE)*3 + space
+                    y = WINDOWHEIGHT - BOXSIZE*1.1
+                    pygame.draw.rect(DISPLAYSURF,BLUE, (x - GAPSIZE/2 , y - GAPSIZE/2, BOXSIZE + GAPSIZE, BOXSIZE + GAPSIZE))         
+                space = space + BOXSIZE + GAPSIZE
+            
+    
+    #Draw the player hand
+    space = 0
+    for tile in hand:
+        x = WINDOWWIDTH/2 - (BOXSIZE+GAPSIZE)*3 + space
+        y = WINDOWHEIGHT - BOXSIZE*1.1
+        drawTile(tile, x, y, BOXSIZE)            
+        space = space + BOXSIZE + GAPSIZE
+    
+    #Hide the currently placed tiles from the hand
+    for pos, (currentPlacedTile, x, y) in currentPlacedTiles:
+        space = 0
+        for tile in hand:
+            if tile == currentPlacedTile:
+                x = WINDOWWIDTH/2 - (BOXSIZE+GAPSIZE)*3 + space
+                y = WINDOWHEIGHT - BOXSIZE*1.1
+                pygame.draw.rect(DISPLAYSURF,WHITE, (x, y, BOXSIZE, BOXSIZE))
+                break 
+            space = space + BOXSIZE + GAPSIZE
+
+def draw_score(DISPLAYSURF, game):
+    #Update the Score
+    for playernr, player in enumerate(game.players, start=1):
+        scoreText = 'Player ' + str(playernr) + ': ' + str(player.total_score())
+        if player == game.current_player:
+            txtColor = GREEN
+        else:
+            txtColor = TEXTCOLOR
+        SCORE_SURF, SCORE_RECT = makeText(scoreText, txtColor, MESSAGECOLOR, WINDOWWIDTH - 125, 25 * playernr)
+        DISPLAYSURF.blit(SCORE_SURF, SCORE_RECT) #Draw statistics of names and scores on top right corner
 
 def drawBoardTile(tile, tilex, tiley): #new method to use on board instead of just drawTile
     x = WINDOWWIDTH/2 - BOXSIZE/2 + tilex*BOXSIZE + tilex*GAPSIZE
