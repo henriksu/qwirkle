@@ -1,5 +1,5 @@
 import random
-from qwirkle.tile import Color, Shape, Tile
+from qwirkle.game_logic.tile import Color, Shape, Tile
 
 
 class Bag():

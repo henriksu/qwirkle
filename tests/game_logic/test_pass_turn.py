@@ -1,8 +1,8 @@
 import unittest
-from qwirkle.game import PassTurn, Player, IllegalPass
-from qwirkle.hand import Hand
-from qwirkle.bag import Bag
-from qwirkle.tile import Tile, Shape, Color
+from qwirkle.game_logic.game import PassTurn, Player, IllegalPass
+from qwirkle.game_logic.hand import Hand
+from qwirkle.game_logic.bag import Bag
+from qwirkle.game_logic.tile import Tile, Shape, Color
 
 
 class TestPassTurn(unittest.TestCase):

@@ -1,5 +1,5 @@
 from copy import copy
-from qwirkle.tile import Color, Shape
+from qwirkle.game_logic.tile import Color, Shape
 
 
 class Hand():

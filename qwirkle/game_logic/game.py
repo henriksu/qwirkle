@@ -1,8 +1,8 @@
-import random
-from qwirkle.bag import Bag
-from qwirkle.hand import Hand
-from qwirkle.board import Board
 import math
+import random
+from qwirkle.game_logic.bag import Bag
+from qwirkle.game_logic.hand import Hand
+from qwirkle.game_logic.board import Board
 
 
 class Player():

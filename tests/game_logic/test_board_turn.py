@@ -1,9 +1,9 @@
 import unittest
-from qwirkle.tile import Tile, Color, Shape
-from qwirkle.hand import Hand
-from qwirkle.board import Board, Position
-from qwirkle.game import Player, BoardTurn, EndOfGame
-from qwirkle.bag import Bag
+from qwirkle.game_logic.tile import Tile, Color, Shape
+from qwirkle.game_logic.hand import Hand
+from qwirkle.game_logic.board import Board, Position
+from qwirkle.game_logic.game import Player, BoardTurn, EndOfGame
+from qwirkle.game_logic.bag import Bag
 
 
 class TestBoardTurn(unittest.TestCase):

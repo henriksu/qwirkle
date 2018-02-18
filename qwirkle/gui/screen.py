@@ -1,9 +1,10 @@
-import pygame, sys
-from pygame.locals import *
-from qwirkle.game import *
-from qwirkle.tile import *
-from qwirkle.board import *
 from builtins import range
+import pygame, sys
+
+from pygame.locals import *
+from qwirkle.game_logic.game import *
+from qwirkle.game_logic.tile import *
+from qwirkle.game_logic.board import *
 
 FPS = 144 # frames per second, the general speed of the program
 WINDOWWIDTH = 1080 # size of window's width in pixels

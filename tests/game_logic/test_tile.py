@@ -1,5 +1,5 @@
 import unittest
-from qwirkle.tile import Tile, Color, Shape
+from qwirkle.game_logic.tile import Tile, Color, Shape
 
 
 class TileTest(unittest.TestCase):

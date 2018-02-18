@@ -1,11 +1,11 @@
 import unittest
 
-from qwirkle.game import Game, Player
-from qwirkle.tile import Tile, Color, Shape
-from qwirkle.hand import Hand
-from qwirkle.board import Board, Position
-from qwirkle.bag import Bag
-from tests.test_pass_turn import MockBoard
+from qwirkle.game_logic.game import Game, Player
+from qwirkle.game_logic.tile import Tile, Color, Shape
+from qwirkle.game_logic.hand import Hand
+from qwirkle.game_logic.board import Board, Position
+from qwirkle.game_logic.bag import Bag
+from tests.game_logic.test_pass_turn import MockBoard
 
 
 class TestGame(unittest.TestCase):

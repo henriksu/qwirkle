@@ -1,5 +1,5 @@
 import unittest
-from qwirkle.game import Game
+from qwirkle.game_logic.game import Game
 
 
 class TestStartingPlayer(unittest.TestCase):

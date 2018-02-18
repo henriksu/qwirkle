@@ -1,5 +1,5 @@
 import unittest
-from qwirkle.board import Position
+from qwirkle.game_logic.board import Position
 
 
 class TestNeighbours(unittest.TestCase):

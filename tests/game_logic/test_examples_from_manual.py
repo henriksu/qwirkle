@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import unittest
-from qwirkle.game import Board
-from qwirkle.tile import Tile, Color, Shape
-from qwirkle.board import Position
+from qwirkle.game_logic.game import Board
+from qwirkle.game_logic.tile import Tile, Color, Shape
+from qwirkle.game_logic.board import Position
 
 
 class TestExamples(unittest.TestCase):

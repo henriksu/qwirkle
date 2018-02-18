@@ -1,4 +1,4 @@
-from qwirkle.game import Game
+from qwirkle.game_logic.game import Game
 import random
 import numpy as np
 

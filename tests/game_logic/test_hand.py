@@ -1,8 +1,8 @@
 from copy import copy
 import unittest
-from qwirkle.tile import Tile, Color, Shape
-from qwirkle.bag import Bag
-from qwirkle.hand import Hand, NonMoveError, MissingTileError
+from qwirkle.game_logic.tile import Tile, Color, Shape
+from qwirkle.game_logic.bag import Bag
+from qwirkle.game_logic.hand import Hand, NonMoveError, MissingTileError
 
 
 class TestHand(unittest.TestCase):
