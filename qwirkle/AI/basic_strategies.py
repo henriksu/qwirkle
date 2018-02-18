@@ -1,6 +1,5 @@
-from qwirkle.game_logic.game import Game
 import random
-import numpy as np
+
 
 ROUNDS_TO_LOOK_BACK = 4
 UNACCEPTABLE_SCORE = 3 # By advice from a web page.
@@ -90,13 +89,6 @@ class BestMoveAndProactiveExchange(BestMoveAI):
             self.do_a_high_score_move(scored_moves, max_score)
 
 
-def run_single_player_AI(game, ai_player):
-    ai = ai_player(game)
-    while game.current_player is not None:
-        ai.make_move()
-    return game
-
-
 # Other possibilities:
 # - Number of qwirkle-able rows/columns (strikes).
 #.- Same as above, but include what tiles are still in play. Prioritize by what I have on my han.
@@ -105,19 +97,3 @@ def run_single_player_AI(game, ai_player):
 # - number of positions open for business after a move.
 # - Opt to exchange tiles if bad fit for board.
 # - Opt to exchange only some tiles (voluntarily keeping some).
-
-
-if __name__ == '__main__':
-    scores = set()
-    for i in range(100):
-        print(i)
-        game = Game.make_new_game(num_players=1)
-        played_game = run_single_player_AI(game, AI)
-        player = played_game.players[0]
-        score = player.total_score()
-        rounds = len(player.scores)
-        scores.add(score/rounds)
-    mean = np.mean(list(scores))
-    std = np.std(list(scores))
-    print(mean)
-    print(std)
