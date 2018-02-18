@@ -8,6 +8,7 @@ UNACCEPTABLE_SCORE = 3 # By advice from a web page.
 
 class AI():
 # avg.: 307.51 std.: 18.18
+# avg.: 2.7952 std.: 0.13978
     def __init__(self, game):
         self.game = game
 
@@ -26,53 +27,56 @@ class AI():
     def no_allowed_moves_turn(self, hand):
         bag_content = len(self.game.bag.tiles)
         if bag_content > 0:
-            tiles = hand.tiles
-            if len(tiles) > bag_content:
-                tiles_to_Swap = random.sample(tiles, bag_content)
-                self.game.exchange_tiles(tiles_to_Swap)
-            else:
-                self.game.exchange_tiles(tiles)
+            self.exchange_as_many_as_possible(hand, bag_content)
         else:
             self.game.pass_round()
+
+    def exchange_as_many_as_possible(self, hand, bag_content):
+        tiles = hand.tiles
+        if len(tiles) > bag_content:
+            tiles_to_Swap = random.sample(tiles, bag_content)
+            self.game.exchange_tiles(tiles_to_Swap)
+        else:
+            self.game.exchange_tiles(tiles)
 
 
 class BestMoveAI(AI):
 # avg.: 4.82557 std.: 0.36824
 # avg.: 4.771155 std.: 0.3123
-    def choose_move(self, legal_moves, hand):
+    def score_moves(self, legal_moves):
         scored_moves = {}
         for move in legal_moves:
             scored_moves[move] = move.score()
         max_score = max(scored_moves.values())
+        return scored_moves, max_score
+
+    def do_a_high_score_move(self, scored_moves, max_score):
         high_score_moves = [move for move, score in scored_moves.items() if
                             score == max_score]
         move = random.choice(list(high_score_moves))
         self.game.make_move(move.tiles_and_positions)
 
+    def choose_move(self, legal_moves, hand):
+        scored_moves, max_score = self.score_moves(legal_moves)
+        self.do_a_high_score_move(scored_moves, max_score)
+
 
 class BestMoveAndProactiveExchange(BestMoveAI):
 # avg.: 4.118 std.: 0.478778 (with 4, 6)
-    def choose_move(self, legal_moves, hand):
-        scored_moves = {}
-        for move in legal_moves:
-            scored_moves[move] = move.score()
-        max_score = max(scored_moves.values())
-        # X previous scores.
-        bag_content = len(self.game.bag.tiles)
+# avg.: 4.7151 std.: 0.351013 (with 4, 3)
+    def should_exchange_tiles(self, bag_content, max_score):
         last_scores = self.game.current_player.scores[-ROUNDS_TO_LOOK_BACK:  ]
         last_scores.append(max_score)
-        if len(last_scores) > 2 and max(last_scores) <= UNACCEPTABLE_SCORE and last_scores[-2] != 0 and bag_content > 0:
-            tiles = hand.tiles
-            if len(tiles) > bag_content:
-                tiles_to_Swap = random.sample(tiles, bag_content)
-                self.game.exchange_tiles(tiles_to_Swap)
-            else:
-                self.game.exchange_tiles(tiles)
+        return len(last_scores) > 2 and max(last_scores) <= UNACCEPTABLE_SCORE and last_scores[-2] != 0 and bag_content > 0
+
+    def choose_move(self, legal_moves, hand):
+        scored_moves, max_score = self.score_moves(legal_moves)
+        # X previous scores.
+        bag_content = len(self.game.bag.tiles)
+        if self.should_exchange_tiles(bag_content, max_score):
+            self.exchange_as_many_as_possible(hand, bag_content)
         else:
-            high_score_moves = [move for move, score in scored_moves.items() if
-                                score == max_score]
-            move = random.choice(list(high_score_moves))
-            self.game.make_move(move.tiles_and_positions)
+            self.do_a_high_score_move(scored_moves, max_score)
 
 
 def run_single_player_AI(game, ai_player):
@@ -97,7 +101,7 @@ if __name__ == '__main__':
     for i in range(100):
         print(i)
         game = Game.make_new_game(num_players=1)
-        played_game = run_single_player_AI(game, BestMoveAndProactiveExchange)
+        played_game = run_single_player_AI(game, AI)
         player = played_game.players[0]
         score = player.total_score()
         rounds = len(player.scores)
