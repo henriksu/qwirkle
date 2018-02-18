@@ -20,16 +20,27 @@ class AI():
         else:
             self.no_allowed_moves_turn(hand)
 
+    def no_allowed_moves_turn(self, hand):
+        bag_content = len(self.game.bag.tiles)
+        if bag_content > 0:
+            self.do_forced_swap(hand, bag_content)
+        else:
+            self.game.pass_round()
+
     def choose_move(self, legal_moves, hand):
         move = random.choice(list(legal_moves))
         self.game.make_move(move.tiles_and_positions)
 
-    def no_allowed_moves_turn(self, hand):
-        bag_content = len(self.game.bag.tiles)
-        if bag_content > 0:
-            self.exchange_as_many_as_possible(hand, bag_content)
-        else:
-            self.game.pass_round()
+    def do_forced_swap(self, hand, bag_content):
+        max_exchangeable = min(len(hand.tiles), bag_content)
+        num_exchanging = random.randrange(1, max_exchangeable+1)
+        tiles_to_swap = random.sample(hand.tiles, num_exchanging)
+        self.game.exchange_tiles(tiles_to_swap)
+
+
+class ExchangeAllIfExchanging(AI):
+    def do_forced_swap(self, hand, bag_content):
+        self.exchange_as_many_as_possible(hand, bag_content)
 
     def exchange_as_many_as_possible(self, hand, bag_content):
         tiles = hand.tiles
@@ -40,7 +51,7 @@ class AI():
             self.game.exchange_tiles(tiles)
 
 
-class BestMoveAI(AI):
+class BestMoveAI(ExchangeAllIfExchanging):
 # avg.: 4.82557 std.: 0.36824
 # avg.: 4.771155 std.: 0.3123
     def score_moves(self, legal_moves):
