@@ -29,7 +29,8 @@ class Player():
 
 
 class Game():
-    def __init__(self, bag, board, players, current_player, passes=0):
+    def __init__(self, bag, board, players, current_player,
+                 passes=0, non_tile_moves=0):
         self.bag = bag
         self.board = board
         self.players = players
@@ -37,6 +38,7 @@ class Game():
         # starting_player = self.determine_starting_player()
         self.set_current_player(current_player)
         self.passes = passes
+        self.non_tile_moves = non_tile_moves
 
     @classmethod
     def make_new_game(cls, num_players, seed=None):
@@ -76,11 +78,16 @@ class Game():
         else:
             self._advance_player()
             self.passes = 0
+            self.non_tile_moves = 0
 
     def exchange_tiles(self, tiles):
         turn = ExchangeTilesTurn(self.current_player, self.bag, tiles)
         turn.execute()
         self._advance_player()
+        self.non_tile_moves += 1
+        if self.non_tile_moves == 50:  # Same number as in chess.
+            print('End by stalemate')
+            self.end_game()
 
     def pass_round(self):
         turn = PassTurn(self.current_player,
@@ -88,7 +95,11 @@ class Game():
         turn.execute()
         self._advance_player()
         self.passes += 1
+        self.non_tile_moves += 1
         if self.passes == self.num_players:
+            self.end_game()
+        if self.non_tile_moves == 50:  # Same number as in chess.
+            print('End by stalemate')
             self.end_game()
 
     def end_game(self):

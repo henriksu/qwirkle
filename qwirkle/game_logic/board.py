@@ -95,8 +95,8 @@ class Move():
         self.tiles_and_positions = tiles_and_positions
         self.positions, self.tiles = zip(*tiles_and_positions)
         self.columns, self.rows = list(zip(*self.positions))
-        self.combined_tiles_and_position = None
-        self.combined_positions = None
+#        self.combined_tiles_and_position = None
+#        self.combined_positions = None
 
     def score(self):
         score = 0
@@ -195,9 +195,17 @@ class Move():
                 count += 1
         return count == 1
 
+    @property
+    def combined_tiles_and_position(self):
+        return self.board.tiles + self.tiles_and_positions
+
+    @property
+    def combined_positions(self):
+        return list(zip(*self.combined_tiles_and_position))[0]
+
     def is_compatible_with_surrounding_tiles(self):
-        self.combined_tiles_and_position = self.board.tiles + self.tiles_and_positions
-        self.combined_positions = list(zip(*self.combined_tiles_and_position))[0]
+#         self.combined_tiles_and_position = self.board.tiles + self.tiles_and_positions
+#         self.combined_positions = list(zip(*self.combined_tiles_and_position))[0]
         if self.all_same_column():
             if not self.verify_column_strike(self.positions[0]):
                 return False

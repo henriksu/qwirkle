@@ -1,13 +1,14 @@
 import random
-
-
-ROUNDS_TO_LOOK_BACK = 4
-UNACCEPTABLE_SCORE = 3 # By advice from a web page.
+import numpy as np
+from qwirkle.game_logic.board import Move
+from qwirkle.game_logic.tile import Shape, Color, Tile
+import itertools
+from collections import defaultdict
 
 
 class AI():
-# avg.: 307.51 std.: 18.18
-# avg.: 2.7952 std.: 0.13978
+    # avg.: 307.51 std.: 18.18
+    # avg.: 2.7952 std.: 0.13978
     def __init__(self, game):
         self.game = game
 
@@ -51,8 +52,8 @@ class ExchangeAllIfExchanging(AI):
 
 
 class BestMoveAI(ExchangeAllIfExchanging):
-# avg.: 4.82557 std.: 0.36824
-# avg.: 4.771155 std.: 0.3123
+    # avg.: 4.82557 std.: 0.36824
+    # avg.: 4.771155 std.: 0.3123
     def score_moves(self, legal_moves):
         scored_moves = {}
         for move in legal_moves:
@@ -71,29 +72,107 @@ class BestMoveAI(ExchangeAllIfExchanging):
         self.do_a_high_score_move(scored_moves, max_score)
 
 
-class BestMoveAndProactiveExchange(BestMoveAI):
-# avg.: 4.118 std.: 0.478778 (with 4, 6)
-# avg.: 4.7151 std.: 0.351013 (with 4, 3)
-    def should_exchange_tiles(self, bag_content, max_score):
-        last_scores = self.game.current_player.scores[-ROUNDS_TO_LOOK_BACK:  ]
-        last_scores.append(max_score)
-        return len(last_scores) > 2 and max(last_scores) <= UNACCEPTABLE_SCORE and last_scores[-2] != 0 and bag_content > 0
+class SimpleProactiveExchange(BestMoveAI):
+    ROUNDS_TO_LOOK_BACK = 4
+    UNACCEPTABLE_SCORE = 3  # By advice from a web page.
+    # avg.: 4.118 std.: 0.478778 (with 4, 6)
+    # avg.: 4.7151 std.: 0.351013 (with 4, 3)
+
+    def __init__(self, game):
+        self.no_proactive_swaps = 0
+        super().__init__(game)
 
     def choose_move(self, legal_moves, hand):
         scored_moves, max_score = self.score_moves(legal_moves)
         # X previous scores.
         bag_content = len(self.game.bag.tiles)
-        if self.should_exchange_tiles(bag_content, max_score):
+        if self.should_exchange_tiles(bag_content, max_score) and bag_content:
+            self.no_proactive_swaps += 1
             self.exchange_as_many_as_possible(hand, bag_content)
         else:
             self.do_a_high_score_move(scored_moves, max_score)
 
+    def should_exchange_tiles(self, bag_content, max_score):
+        last_scores = \
+            self.game.current_player.scores[-self.ROUNDS_TO_LOOK_BACK:]
+        last_scores.append(max_score)
+        return len(last_scores) > 2 and \
+            max(last_scores) <= self.UNACCEPTABLE_SCORE and \
+            last_scores[-2] != 0 and bag_content > 0
 
+
+class SimpleBoardBasedProactiveExchange(SimpleProactiveExchange):
+    # avg.: 3.58723187918 std.: 0.502896167549
+    # avg.: 3.87815292667 std.: 0.389971484227 after only considering tiles that can be drawn.
+    # avg.: 4.50563448006 std.: 0.509617095829 after trying to approximate expected returns. 50 tries
+    # avg.: 4.57028669443 std.: 0.458166148928 after increasing tries to 500
+    # increasing to 2.5 times max score -> around 4.7.
+    # avg.: 4.70551209571 std.: 0.370894895012 2.5*max_Score + 2 (results in fewer swaps)
+    # avg.: 4.78300223679 std.: 0.382913973977 2.8*max_Score + 2
+    # avg.: 4.82635925493 std.: 0.361110419439 2.8*max_score + 4
+
+    def should_exchange_tiles(self, bag_content, max_score):
+        if self.skipped_last():
+            return False
+        unseen_tiles = self.get_unseen_tiles()
+        tiles_list = list(unseen_tiles.keys())  # Is list() needed?
+        tile_scores = self.get_tile_scores(tiles_list)
+        if not tile_scores:
+            return False
+        max_scores = self.get_expected_max_score(unseen_tiles, tile_scores)
+        expected_max_score = np.mean(max_scores)
+        return (expected_max_score > 2.8*max_score + 4)
+
+    def get_expected_max_score(self, unseen_tiles, tile_scores):
+        scores = []
+        for tile, count in unseen_tiles.items():
+            score_for_tile = [tile_scores[tile]]*count
+            scores.extend(score_for_tile)
+        # simulations
+        best = []
+        tiles = min(6, len(self.game.bag.tiles))
+        for _ in range(500):
+            hand = random.sample(scores, tiles)
+            best.append(max(hand))
+        return best
+
+    def skipped_last(self):
+        scores = self.game.current_player.scores
+        if scores:
+            return scores[-1] == 0
+        else:
+            return False
+
+    def get_total_tiles(self):
+        tile_types = [Tile(color, shape) for color, shape in itertools.product(Color, Shape)] # TODO: Use remaining unseen_tiles.
+        total_tiles = {tile: 3 for tile in tile_types}
+        return total_tiles
+
+    def get_unseen_tiles(self):
+        tiles = self.get_total_tiles()
+        for _, tile in self.game.board.tiles:
+            tiles[tile] -= 1
+        for tile in self.game.current_player.hand.tiles:
+            tiles[tile] -= 1
+        return {tile: count for tile, count in tiles.items() if count > 0}
+
+    def get_tile_scores(self, unseen_tiles):
+        tile_scores = defaultdict(lambda: 0)
+        adj_pos = self.game.board.adjacent_positions()
+        for pos in adj_pos:
+            move = Move(self.game.board, [(pos, None)])
+            score = move.score()
+            for tile in unseen_tiles:
+                move = Move(self.game.board, [(pos, tile)])
+                if move.is_allowed():
+                    tile_scores[tile] = max(score, tile_scores[tile])
+        return tile_scores
+        
 # Other possibilities:
 # - Number of qwirkle-able rows/columns (strikes).
-#.- Same as above, but include what tiles are still in play. Prioritize by what I have on my han.
+#.- Same as above, but include what unseen_tiles are still in play. Prioritize by what I have on my han.
 # - highest score on next round with pieces left on hand.
 # - same as above, just with expectation of pices that CAN still be drawn.
 # - number of positions open for business after a move.
-# - Opt to exchange tiles if bad fit for board.
-# - Opt to exchange only some tiles (voluntarily keeping some).
+# - Opt to exchange unseen_tiles if bad fit for board.
+# - Opt to exchange only some unseen_tiles (voluntarily keeping some).
