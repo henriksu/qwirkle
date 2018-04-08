@@ -1,7 +1,8 @@
 from qwirkle.game_logic.game import Game
 import numpy as np
 from qwirkle.AI.basic_strategies import AI, SimpleBoardBasedProactiveExchange,\
-    SimpleProactiveExchange, BestMoveAI, ExchangeAllIfExchanging
+    SimpleProactiveExchange, BestSingleMoveAI, ExchangeAllIfExchanging,\
+    BestMultiMoveAI
 
 
 def run_single_player_AI(game, ai_player):
@@ -20,7 +21,7 @@ if __name__ == '__main__':
     for i in range(100):
         print(i)
         game = Game.make_new_game(num_players=1)
-        played_game = run_single_player_AI(game, SimpleBoardBasedProactiveExchange)
+        played_game = run_single_player_AI(game, BestMultiMoveAI)
         player = played_game.players[0]
         score = player.total_score()
         rounds = len(player.scores)

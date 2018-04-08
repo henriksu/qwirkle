@@ -65,5 +65,5 @@ class MockBoard():
     def __init__(self, moves):
         self.moves = moves
 
-    def legal_moves(self, hand):
+    def legal_single_piece_moves(self, hand):
         return self.moves

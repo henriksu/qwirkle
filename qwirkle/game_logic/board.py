@@ -1,4 +1,5 @@
 from collections import namedtuple
+import copy
 
 
 class Position(namedtuple('Position', 'x y')):
@@ -62,7 +63,7 @@ class Board():
         existing_indexes = map(lambda p: p.y, pos)
         return existing_indexes
 
-    def legal_moves(self, hand):
+    def legal_single_piece_moves(self, hand):
         moves = set()
         if len(self.positions) == 0:
             positions = [Position(0, 0)]
@@ -73,7 +74,111 @@ class Board():
                 move = Move(self, [(pos, tile)])
                 if move.is_allowed():
                     moves.add(move)
-            # TODO: No multi-tile move considered. FIX? not needed for determining legality of passes.
+        return moves
+
+    def legal_moves(self, hand):
+        single_piece_moves = self._get_single_piece_moves(hand)
+        two_piece_moves = self._get_two_piece_moves(single_piece_moves)
+        two_piece_moves = uniquify_moves(two_piece_moves)
+        three_piece_moves = self._get_one_pluss_moves(two_piece_moves)
+        three_piece_moves = uniquify_moves(three_piece_moves)
+        four_piece_moves = self._get_one_pluss_moves(three_piece_moves)
+        four_piece_moves = uniquify_moves(four_piece_moves)
+        five_piece_moves = self._get_one_pluss_moves(four_piece_moves)
+        five_piece_moves = uniquify_moves(five_piece_moves)
+        six_piece_moves = self._get_one_pluss_moves(five_piece_moves)
+        six_piece_moves = uniquify_moves(six_piece_moves)
+
+        moves_list = [single_piece_moves, two_piece_moves, three_piece_moves,
+                      four_piece_moves, five_piece_moves, six_piece_moves]
+        result = []
+        for moves in moves_list:
+            new_moves = set()
+            for move, _ in moves:
+                new_moves.add(move)
+            result.append(new_moves)
+        return result
+        # Does not take the union of the sets,
+        # because the highest paying move is guaranteed to
+        # be in the last non-empty set.
+
+    def _get_single_piece_moves(self, hand):
+        moves = set()
+        if len(self.positions) == 0:
+            positions = [Position(0, 0)]
+        else:
+            positions = self.adjacent_positions()
+        hand_set = set(hand.tiles)
+        for pos in positions:
+            for tile in hand_set:
+                move = Move(self, [(pos, tile)])
+                if move.is_allowed():
+                    reduced_hand_set = set(hand_set)
+                    reduced_hand_set.remove(tile)
+                    reduced_hand_set = frozenset(reduced_hand_set)
+                    # TODO: Also remove any pieces with neighter
+                    # same color or same shape as the used piece.
+                    moves.add((move, reduced_hand_set))
+        return moves
+
+    def _get_two_piece_moves(self, single_piece_moves):
+        # Try to place remaining pieces in hand at the end of any "strike" the
+        # current piece is part of.
+        moves = set()
+        for move, hand_set in single_piece_moves:
+            pos = move.positions[0]
+
+            # Positions in column
+            strike = move.get_column_strike(pos)
+            pos1 = Position(pos[0], strike[0]-1)
+            pos2 = Position(pos[0], strike[-1]+1)
+
+            # Positions in row
+            strike = move.get_row_strike(pos)
+            pos3 = Position(strike[0]-1, pos[1])
+            pos4 = Position(strike[-1]+1, pos[1])
+
+            positions = (pos1, pos2, pos3, pos4)
+            for tile in hand_set:
+                for position in positions:
+                    tiles_and_positions = copy.copy(move.tiles_and_positions)
+                    tiles_and_positions.append((position, tile))
+                    new_move = Move(self, tiles_and_positions)
+                    if new_move.is_allowed():
+                        reduced_hand_set = set(hand_set)
+                        reduced_hand_set.remove(tile)
+                        reduced_hand_set = frozenset(reduced_hand_set)
+                        # TODO: At this point the move has a well defined
+                        # color or shape. Identify it, and remove all
+                        # irrelevant pieces (for efficiency)
+                        moves.add((new_move, reduced_hand_set))
+        return moves
+
+    def _get_one_pluss_moves(self, multi_piece_moves):
+        """'multi_piece_moves' consist of at least two pieces,
+        the row/columnness is established."""
+        moves = set()
+        for move, hand_set in multi_piece_moves:
+            pos = move.positions[0]
+            if move.all_same_column():
+                strike = move.get_column_strike(pos)
+                pos1 = Position(pos[0], strike[0]-1)
+                pos2 = Position(pos[0], strike[-1]+1)
+            else:
+                strike = move.get_row_strike(pos)
+                pos1 = Position(strike[0]-1, pos[1])
+                pos2 = Position(strike[-1]+1, pos[1])
+            positions = (pos1, pos2)
+            for tile in hand_set:
+                for position in positions:
+                    tiles_and_positions = copy.copy(move.tiles_and_positions)
+                    tiles_and_positions.append((position, tile))
+                    new_move = Move(self, tiles_and_positions)
+                    if new_move.is_allowed():
+                        reduced_hand_set = set(hand_set)
+                        reduced_hand_set.remove(tile)
+                        reduced_hand_set = frozenset(reduced_hand_set)
+                        moves.add((new_move, reduced_hand_set))
         return moves
 
     def adjacent_positions(self):
@@ -267,6 +372,17 @@ class Move():
 
     def all_same_column(self):
         return len(set(self.columns)) == 1
+
+
+def uniquify_moves(moves):
+    new_moves = set()
+    result = set()
+    for move, hand in moves:
+        tiles_and_positions = tuple(move.tiles_and_positions)
+        if tiles_and_positions not in new_moves:
+            new_moves.add(tiles_and_positions)
+            result.add((move, hand))
+    return result
 
 
 def is_valid_strike(tiles):

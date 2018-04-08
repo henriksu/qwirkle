@@ -14,9 +14,9 @@ class AI():
 
     def make_move(self):
         hand = self.game.current_player.hand
-        legal_moves = self.game.board.legal_moves(hand)
-        if legal_moves:
-            self.choose_move(legal_moves, hand)
+        legal_single_piece_moves = self.game.board.legal_single_piece_moves(hand)
+        if legal_single_piece_moves:
+            self.choose_move(legal_single_piece_moves, hand)
         else:
             self.no_allowed_moves_turn(hand)
 
@@ -27,8 +27,8 @@ class AI():
         else:
             self.game.pass_round()
 
-    def choose_move(self, legal_moves, hand):
-        move = random.choice(list(legal_moves))
+    def choose_move(self, legal_single_piece_moves, hand):
+        move = random.choice(list(legal_single_piece_moves))
         self.game.make_move(move.tiles_and_positions)
 
     def do_forced_swap(self, hand, bag_content):
@@ -51,7 +51,7 @@ class ExchangeAllIfExchanging(AI):
             self.game.exchange_tiles(tiles)
 
 
-class BestMoveAI(ExchangeAllIfExchanging):
+class BestSingleMoveAI(ExchangeAllIfExchanging):
     # avg.: 4.82557 std.: 0.36824
     # avg.: 4.771155 std.: 0.3123
     def score_moves(self, legal_moves):
@@ -67,12 +67,25 @@ class BestMoveAI(ExchangeAllIfExchanging):
         move = random.choice(list(high_score_moves))
         self.game.make_move(move.tiles_and_positions)
 
-    def choose_move(self, legal_moves, hand):
-        scored_moves, max_score = self.score_moves(legal_moves)
+    def choose_move(self, legal_single_piece_moves, hand):
+        scored_moves, max_score = self.score_moves(legal_single_piece_moves)
         self.do_a_high_score_move(scored_moves, max_score)
 
 
-class SimpleProactiveExchange(BestMoveAI):
+class BestMultiMoveAI(BestSingleMoveAI):
+    # avg.: 7.843 std.: 0.518
+
+    def choose_move(self, legal_single_piece_moves, hand):
+        legal_moves = self.game.board.legal_moves(hand)
+        while len(legal_moves[-1]) == 0:
+            del legal_moves[-1]
+            #TODO: Horrible algorithm.
+        interesting_moves = legal_moves[-1]
+        scored_moves, max_score = self.score_moves(interesting_moves)
+        self.do_a_high_score_move(scored_moves, max_score)
+
+
+class SimpleProactiveExchange(BestSingleMoveAI):
     ROUNDS_TO_LOOK_BACK = 4
     UNACCEPTABLE_SCORE = 3  # By advice from a web page.
     # avg.: 4.118 std.: 0.478778 (with 4, 6)
@@ -82,8 +95,8 @@ class SimpleProactiveExchange(BestMoveAI):
         self.no_proactive_swaps = 0
         super().__init__(game)
 
-    def choose_move(self, legal_moves, hand):
-        scored_moves, max_score = self.score_moves(legal_moves)
+    def choose_move(self, legal_single_piece_moves, hand):
+        scored_moves, max_score = self.score_moves(legal_single_piece_moves)
         # X previous scores.
         bag_content = len(self.game.bag.tiles)
         if self.should_exchange_tiles(bag_content, max_score) and bag_content:

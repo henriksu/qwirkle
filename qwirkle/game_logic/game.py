@@ -169,7 +169,7 @@ class PassTurn():
             raise IllegalPass()
 
     def cannot_move(self):
-        return self.bag.is_empty() and len(self.board.legal_moves(self.player.hand)) == 0
+        return self.bag.is_empty() and len(self.board.legal_single_piece_moves(self.player.hand)) == 0
 
 
 class IllegalPass(ValueError):
