@@ -1,6 +1,5 @@
 from collections import namedtuple, Counter
 import copy
-from wx import Right
 from qwirkle.game_logic.tile import Color, Shape, Tile
 
 
@@ -207,26 +206,53 @@ class Board():
         for pos in self.adjacent_positions():
             if len(self.legal_tiles(pos)) > 0:
                 result.add(pos)
-        return pos
+        return result
 
     def legal_positions_with_exhaustion(self):
         """Same as legal_positions, but takes into account
         that all three of some tiles are already played."""
         # TODO: Can be cached and kept up to date.
-        result = set()
         remaining_tiles = self.remaining_tiles()
+        return self.legal_positions_based_on_tiles(remaining_tiles)
+
+    def legal_positions_based_on_tiles(self, tiles):
+        result = set()
         for pos in self.adjacent_positions():
-            if len(self.legal_tiles(pos, remaining_tiles)) > 0:
+            if len(self.legal_tiles(pos, tiles)) > 0:
                 result.add(pos)
-        return pos
+        return result
+
+    def legal_positions_based_on_tile(self, tile):
+        return self.legal_positions_based_on_tiles(set(tile))
+
+    def legal_positions_based_on_provisional_move_and_tile(self, move, tile):
+        raise NotImplementedError()
+        # TODO: implement
+
+    def all_reachable_positions_based_on_hand(self, hand):
+        # differs from legal_positions_based_on_tiles() by
+        # including positions not adjacent to existing tiles.
+        legal_moves = self.legal_moves(hand)
+        result = set()
+        for moves in legal_moves:
+            for move in moves:
+                result.update(move.positions)
+        return result
 
     def forbidden_positions(self):
+        """Return set of positions that cannot be legally filled with a tile.
+
+        As a game of Qwirkle unfolds, some positions on the board cannot be filled.
+        This can be due to them being at the end of a qwirkle or due to conflicting
+        demands from different adjacent positions.
+
+        See also: forbidden_positions_with_exhaustion()"""
         # TODO: Can be cached and kept up to date.
         result = set()
         for pos in self.adjacent_positions():
             if len(self.legal_tiles(pos)) == 0:
                 result.add(pos)
-        return pos
+        return result
 
     def forbidden_positions_with_exhaustion(self):
         # TODO: Can be cached and kept up to date.
@@ -237,7 +263,7 @@ class Board():
         for pos in self.adjacent_positions():
             if len(self.legal_tiles(pos, remaining_tiles)) == 0:
                 result.add(pos)
-        return pos
+        return result
 
     def remaining_tiles(self):
         """Returns a set of tiles that could still be played,
