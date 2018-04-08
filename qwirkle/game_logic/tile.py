@@ -25,3 +25,12 @@ class Tile(namedtuple('Tile', 'color shape')):
         color = self.color.name.lower()
         shape = self.shape.name.lower()
         return ' '.join([color, shape])
+
+    @classmethod
+    def set_of_all_tiles(cls):
+        tiles = set()
+        for color in Color:
+            for shape in Shape:
+                tiles.add(cls(color, shape))
+        return tiles
+

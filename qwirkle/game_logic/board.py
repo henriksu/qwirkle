@@ -1,5 +1,7 @@
-from collections import namedtuple
+from collections import namedtuple, Counter
 import copy
+from wx import Right
+from qwirkle.game_logic.tile import Color, Shape, Tile
 
 
 class Position(namedtuple('Position', 'x y')):
@@ -35,6 +37,16 @@ class Board():
         else:
             positions = ()
         return positions
+
+    @property
+    def tiles_list(self):
+        # TODO: Rename to "tiles", after renaming the
+        # existing "tiles" variable.
+        if self.tiles:
+            tiles = list(zip(*self.tiles))[1]
+        else:
+            tiles = ()
+        return tiles
 
     def is_allowed(self, tiles_and_positions):
         move = Move(self, tiles_and_positions)
@@ -188,6 +200,83 @@ class Board():
                 if (neigh not in self.positions) and (neigh not in marked):
                     marked.add(neigh)
                     yield neigh
+
+    def legal_positions(self):
+        # TODO: Can be cached and kept up to date.
+        result = set()
+        for pos in self.adjacent_positions():
+            if len(self.legal_tiles(pos)) > 0:
+                result.add(pos)
+        return pos
+
+    def legal_positions_with_exhaustion(self):
+        """Same as legal_positions, but takes into account
+        that all three of some tiles are already played."""
+        # TODO: Can be cached and kept up to date.
+        result = set()
+        remaining_tiles = self.remaining_tiles()
+        for pos in self.adjacent_positions():
+            if len(self.legal_tiles(pos, remaining_tiles)) > 0:
+                result.add(pos)
+        return pos
+
+    def forbidden_positions(self):
+        # TODO: Can be cached and kept up to date.
+        result = set()
+        for pos in self.adjacent_positions():
+            if len(self.legal_tiles(pos)) == 0:
+                result.add(pos)
+        return pos
+
+    def forbidden_positions_with_exhaustion(self):
+        # TODO: Can be cached and kept up to date.
+        """Same as forbidden positions, but takes into account
+        that all three of some tiles are already played."""
+        result = set()
+        remaining_tiles = self.remaining_tiles()
+        for pos in self.adjacent_positions():
+            if len(self.legal_tiles(pos, remaining_tiles)) == 0:
+                result.add(pos)
+        return pos
+
+    def remaining_tiles(self):
+        """Returns a set of tiles that could still be played,
+        that is less than three instances of it is found on the board.
+        """
+        tile = Tile.set_of_all_tiles()
+        result = set()
+        count = Counter(self.tiles_list)
+        for tiles in tiles:
+            if count[tile] < 3:
+                result.add(tile)
+        return result
+
+    def legal_tiles(self, adjacent_position, tiles=None):
+        """Given a Position, this method returns the set
+        of tiles that can be placed there.
+        """
+#         # 0.1 check not occupied
+#         if adjacent_position in self.positions:
+#             raise ValueError('Position already occupied.')
+#         # 0.2 check actually adjacent.
+#         neighbours = adjacent_position.neighbour_positions()
+#         for pos in neighbours:
+#             if pos in self.positions:
+#                 break
+#         else:
+#             raise ValueError('Position not adjacent to any tile.')
+        # 1. For each adjacent strike, find set of allowed continuations.
+        if tiles is None:
+            tiles = Tile.set_of_all_tiles()
+        result = set()
+        for tile in tiles:
+            if Move(self, [(adjacent_position, tile)]).is_allowed():
+                result.add(tile)
+        return result
+        # Note: this set can be cashed, and as the game unfolds,
+        # the set can only shrink.
+        # In particular. Certain squares will become unusable.
+        # IF the reuslt is to be cached, another algorithm may be better.
 
 
 class IllegalMoveError(ValueError):
