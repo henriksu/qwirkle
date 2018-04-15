@@ -269,10 +269,10 @@ class Board():
         """Returns a set of tiles that could still be played,
         that is less than three instances of it is found on the board.
         """
-        tile = Tile.set_of_all_tiles()
+        tiles = Tile.set_of_all_tiles()
         result = set()
         count = Counter(self.tiles_list)
-        for tiles in tiles:
+        for tile in tiles:
             if count[tile] < 3:
                 result.add(tile)
         return result

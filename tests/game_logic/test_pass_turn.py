@@ -11,7 +11,7 @@ class TestPassTurn(unittest.TestCase):
         hand = Hand(tiles)
         player = Player(hand)
         bag = Bag([])
-        board = MockBoard(moves=[])
+        board = MockBoard(moves=[], possible_moves=[1, 2, 3])
         turn = PassTurn(player, bag, board)
         turn.execute()
         points = player.total_score()
@@ -26,7 +26,7 @@ class TestIllegalPassTurn(unittest.TestCase):
         hand = Hand(tiles)
         player = Player(hand)
         bag = Bag([])
-        board = MockBoard(moves=['Unseen or unwanted move'])
+        board = MockBoard(moves=['Unseen or unwanted move'], possible_moves=[1, 2, 3])
         turn = PassTurn(player, bag, board)
         with self.assertRaises(IllegalPass):
             turn.execute()
@@ -39,7 +39,7 @@ class TestIllegalPassTurn(unittest.TestCase):
         hand = Hand(tiles)
         player = Player(hand)
         bag = Bag(['Tile in bag'])
-        board = MockBoard(moves=[])
+        board = MockBoard(moves=[], possible_moves=[1, 2, 3])
         turn = PassTurn(player, bag, board)
         with self.assertRaises(IllegalPass):
             turn.execute()
@@ -52,7 +52,7 @@ class TestIllegalPassTurn(unittest.TestCase):
         hand = Hand(tiles)
         player = Player(hand)
         bag = Bag(['Tile in bag'])
-        board = MockBoard(moves=['unwanted move'])
+        board = MockBoard(moves=['unwanted move'], possible_moves=[1, 2, 3])
         turn = PassTurn(player, bag, board)
         with self.assertRaises(IllegalPass):
             turn.execute()
@@ -62,8 +62,12 @@ class TestIllegalPassTurn(unittest.TestCase):
 
 
 class MockBoard():
-    def __init__(self, moves):
+    def __init__(self, moves, possible_moves):
         self.moves = moves
+        self.possible_moves = possible_moves
 
     def legal_single_piece_moves(self, hand):
         return self.moves
+
+    def legal_positions_with_exhaustion(self):
+        return self.possible_moves

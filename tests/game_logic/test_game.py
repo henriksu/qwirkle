@@ -34,8 +34,7 @@ class TestStandardGame(unittest.TestCase):
                     Tile(Color.ORANGE, Shape.SQUARE),
                     Tile(Color.PURPLE, Shape.X)]
         self.assertSetEqual(set(player_2), set(expected))
-        self.assertEqual(0, self.game.passes)
-
+        
 
 class TestGameMoves(unittest.TestCase):
     def test_normal_move(self):
@@ -50,7 +49,7 @@ class TestGameMoves(unittest.TestCase):
         player2 = Player([])  # TODO: Illegal
         board = Board([(Position(0, 0), Tile(Color.RED, Shape.DIAMOND))])
         bag = Bag([Tile(Color.GREEN, Shape.CIRCLE)])
-        game = Game(bag, board, [player2, player1], player1, passes=1)
+        game = Game(bag, board, [player2, player1], player1)
         tiles_and_positions = [(Position(0, 1),
                                Tile(Color.RED, Shape.CLOVER))]
         game.make_move(tiles_and_positions)
@@ -65,7 +64,6 @@ class TestGameMoves(unittest.TestCase):
         self.assertSetEqual(set(expected_tiles_on_hand),
                             set(player1.hand.tiles))
         self.assertEqual(0, len(bag.tiles))
-        self.assertEqual(0, game.passes)
         self.assertEqual(player2, game.current_player)
 
     def test_last_move(self):
@@ -75,7 +73,7 @@ class TestGameMoves(unittest.TestCase):
         player2 = Player([])  # TODO: Illegal state
         board = Board([(Position(0, 0), Tile(Color.RED, Shape.DIAMOND))])
         bag = Bag([])
-        game = Game(bag, board, [player2, player1], player1, passes=1)
+        game = Game(bag, board, [player2, player1], player1)
         tiles_and_positions = [(Position(0, 1),
                                Tile(Color.RED, Shape.CLOVER))]
         game.make_move(tiles_and_positions)
@@ -88,14 +86,15 @@ class TestGameMoves(unittest.TestCase):
 
 
 class TestExchangeTiles(unittest.TestCase):
+    # TODO: DOn't allow the  very first turn to be exchanging tiles!
     def test_exchange_tiles(self):
         tiles = [Tile(Color.RED, Shape.CIRCLE)]
         hand = Hand(tiles)
         player1 = Player(hand)
         player2 = Player([])  # TODO: Illegal state.
         bag = Bag([Tile(Color.GREEN, Shape.CLOVER)])
-        board = Board()
-        game = Game(bag, board, [player2, player1], player1, passes=1)
+        board = Board([(Position(0, 0), Tile(Color.RED, Shape.DIAMOND))])
+        game = Game(bag, board, [player2, player1], player1)
         tiles_to_exchange = [Tile(Color.RED, Shape.CIRCLE)]
         game.exchange_tiles(tiles_to_exchange)
         expected_hand = [Tile(Color.GREEN, Shape.CLOVER)]
@@ -114,14 +113,13 @@ class TestPassTurn(unittest.TestCase):
         player2 = Player([])
         player3 = Player([])
         bag = Bag([])
-        board = MockBoard(moves=[])
-        game = Game(bag, board, [player2, player3, player1], player1, passes=0)
+        board = MockBoard(moves=[], possible_moves=[1, 2, 3])
+        game = Game(bag, board, [player2, player3, player1], player1)
         game.pass_round()
         points = player1.total_score()
         self.assertEqual(0, points)
         tiles = [Tile(Color.RED, Shape.CIRCLE)]
         self.assertListEqual(tiles, player1.hand.tiles)
-        self.assertEqual(1, game.passes)
         self.assertEqual(player2, game.current_player)
 
     def test_pass_and_end_game(self):
@@ -130,14 +128,13 @@ class TestPassTurn(unittest.TestCase):
         player1 = Player(hand)
         player2 = Player([])
         bag = Bag([])
-        board = MockBoard(moves=[])
-        game = Game(bag, board, [player2, player1], player1, passes=1)
+        board = MockBoard(moves=[], possible_moves=[])
+        game = Game(bag, board, [player2, player1], player1)
         game.pass_round()
         points = player1.total_score()
         self.assertEqual(0, points)
         tiles = [Tile(Color.RED, Shape.CIRCLE)]
         self.assertListEqual(tiles, player1.hand.tiles)
-        self.assertEqual(2, game.passes)
         self.assertIsNone(game.current_player)
 
 

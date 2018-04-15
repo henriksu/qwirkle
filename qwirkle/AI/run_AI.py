@@ -18,10 +18,10 @@ def run_single_player_AI(game, ai_player):
 
 if __name__ == '__main__':
     scores = set()
-    for i in range(100):
+    for i in range(500):
         print(i)
         game = Game.make_new_game(num_players=1)
-        played_game = run_single_player_AI(game, BestMultiMoveAI)
+        played_game = run_single_player_AI(game, AI)
         player = played_game.players[0]
         score = player.total_score()
         rounds = len(player.scores)
