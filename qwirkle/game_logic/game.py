@@ -1,5 +1,6 @@
 import math
 import random
+
 from qwirkle.game_logic.bag import Bag
 from qwirkle.game_logic.hand import Hand
 from qwirkle.game_logic.board import Board
@@ -78,18 +79,12 @@ class Game():
         turn = ExchangeTilesTurn(self.current_player, self.bag, tiles)
         turn.execute()
         self._advance_player()
-        if len(self.board.legal_positions_with_exhaustion()) == 0:
-            print('End by stalemate')
-            self.end_game()
 
     def pass_round(self):
         turn = PassTurn(self.current_player,
                         self.bag, self.board)
         turn.execute()
         self._advance_player()
-        if len(self.board.legal_positions_with_exhaustion()) == 0:
-            print('End by stalemate')
-            self.end_game()
 
     def end_game(self):
         self.current_player = None
@@ -120,6 +115,9 @@ class BoardTurn():
         hand.remove_old_tiles_from_hand(tiles)
         hand.fill_from(self.bag)
         self.file_score(board_score)
+        if not self.board.has_a_legal_move():
+            print('End by stalemate') # TODO: Move to exception message.
+            raise EndOfGame()
 
     def file_score(self, board_score):
         if self.player.hand.is_empty():

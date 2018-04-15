@@ -208,6 +208,23 @@ class Board():
                 result.add(pos)
         return result
 
+    def has_a_legal_move(self):
+        """Same as legal_positions_with_exhaustion, but returns early
+        once a legal move is found."""
+        # TODO: Can be cached and kept up to date.
+        # TODO: see similarity to legal single piece moves.
+        remaining_tiles = self.remaining_tiles()
+        if len(self.positions) == 0:
+            return True
+        else:
+            positions = self.adjacent_positions()
+        for pos in positions:
+            for tile in remaining_tiles:
+                move = Move(self, [(pos, tile)])
+                if move.is_allowed():
+                    return True
+        return False
+
     def legal_positions_with_exhaustion(self):
         """Same as legal_positions, but takes into account
         that all three of some tiles are already played."""
