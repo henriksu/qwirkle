@@ -86,6 +86,9 @@ class Game():
         self._advance_player()
         self.non_tile_moves += 1
         if self.non_tile_moves == 50:  # Same number as in chess.
+        # Alternative: if len(self.board.legal_positions_with_exhaustion()) == 0:
+        # TODO: Write tests for the alternative. the remove the self.non_tile_moves variable.
+            # TODO: change condition to no legal moves at all.
             print('End by stalemate')
             self.end_game()
 
@@ -97,8 +100,12 @@ class Game():
         self.passes += 1
         self.non_tile_moves += 1
         if self.passes == self.num_players:
+        # TODO: WHen legal_positions_with_exhaustion() is implemented for stale games, this can be removed,
             self.end_game()
         if self.non_tile_moves == 50:  # Same number as in chess.
+        # Alternative: if len(self.board.legal_positions_with_exhaustion()) == 0:
+        # TODO: Write tests for the alternative. the remove the self.non_tile_moves variable.
+            # TODO: change condition to no legal moves at all.
             print('End by stalemate')
             self.end_game()
 
