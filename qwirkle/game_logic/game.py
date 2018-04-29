@@ -89,7 +89,6 @@ class Game():
     def end_game(self):
         self.current_player = None
         self._current_player = None
-        # TODO: Consider end of iteration.
 
     def _advance_player(self):
         self._current_player = (self._current_player + 1) % self.num_players

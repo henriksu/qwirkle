@@ -204,7 +204,7 @@ class Board():
         # TODO: Can be cached and kept up to date.
         result = set()
         for pos in self.adjacent_positions():
-            if len(self.legal_tiles(pos)) > 0:
+            if len(self._legal_tiles(pos)) > 0:
                 result.add(pos)
         return result
 
@@ -235,16 +235,12 @@ class Board():
     def legal_positions_based_on_tiles(self, tiles):
         result = set()
         for pos in self.adjacent_positions():
-            if len(self.legal_tiles(pos, tiles)) > 0:
+            if len(self._legal_tiles(pos, tiles)) > 0:
                 result.add(pos)
         return result
 
     def legal_positions_based_on_tile(self, tile):
         return self.legal_positions_based_on_tiles(set(tile))
-
-    def legal_positions_based_on_provisional_move_and_tile(self, move, tile):
-        raise NotImplementedError()
-        # TODO: implement
 
     def all_reachable_positions_based_on_hand(self, hand):
         # differs from legal_positions_based_on_tiles() by
@@ -267,7 +263,7 @@ class Board():
         # TODO: Can be cached and kept up to date.
         result = set()
         for pos in self.adjacent_positions():
-            if len(self.legal_tiles(pos)) == 0:
+            if len(self._legal_tiles(pos)) == 0:
                 result.add(pos)
         return result
 
@@ -278,7 +274,7 @@ class Board():
         result = set()
         remaining_tiles = self.remaining_tiles()
         for pos in self.adjacent_positions():
-            if len(self.legal_tiles(pos, remaining_tiles)) == 0:
+            if len(self._legal_tiles(pos, remaining_tiles)) == 0:
                 result.add(pos)
         return result
 
@@ -294,7 +290,40 @@ class Board():
                 result.add(tile)
         return result
 
-    def legal_tiles(self, adjacent_position, tiles=None):
+    def legal_tiles(self, hand):
+        """Given a hand, return those tiles in the hand that can be played this round.
+
+        That is every tile, except the ones that are guaranteed to stay on the hand (unless you swap tiles).
+        """
+        # TODO: Not efficient algorithm.
+        # TODO: Has not even been run.
+        legal_moves = self.legal_moves(hand)
+        result = set()
+        for move in legal_moves:
+            result.union(move.tiles)
+        return result
+
+    def immediately_legal_tiles(self, hand, half_move):
+        """Given a hand and a half played move, return those tiles that can be layed down immediately.
+
+        That is such that the result is a legal move without playing any further tiles.s
+        """
+        raise NotImplementedError()
+
+    def legal_positions_based_on_provisional_move_and_tile(self, move, tile):
+        raise NotImplementedError()
+        # TODO: implement
+
+    def qwirkleable_strikes(self):
+        """Return those strikes on the board (including one-tiles?) that have the potential for completion.
+
+        Needs to check both tiles in bag, available space, and compatibility with surrounding tiles.
+        """
+        raise NotImplementedError()
+
+
+# There are only 12 different kinds of qwirkles that can be made. Keep track of which ones are still available... it can help decisions.
+    def _legal_tiles(self, adjacent_position, tiles=None):
         """Given a Position, this method returns the set
         of tiles that can be placed there.
         """
@@ -443,6 +472,7 @@ class Move():
     def is_compatible_with_surrounding_tiles(self):
 #         self.combined_tiles_and_position = self.board.tiles + self.tiles_and_positions
 #         self.combined_positions = list(zip(*self.combined_tiles_and_position))[0]
+        # TODO: Consider identifying one tile moves and treat it specially?
         if self.all_same_column():
             if not self.verify_column_strike(self.positions[0]):
                 return False
