@@ -3,4 +3,5 @@ __pycache__
 .cache
 .project
 .pydevproject
+qwirkle/AI/analysis/*
 

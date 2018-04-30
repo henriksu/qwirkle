@@ -64,6 +64,7 @@ class BestSingleMoveAI(ExchangeAllIfExchanging):
     def do_a_high_score_move(self, scored_moves, max_score):
         high_score_moves = [move for move, score in scored_moves.items() if
                             score == max_score]
+        self.num_high_score = len(list(high_score_moves))
         move = random.choice(list(high_score_moves))
         self.game.make_move(move.tiles_and_positions)
 
@@ -77,11 +78,7 @@ class BestMultiMoveAI(BestSingleMoveAI):
 
     def choose_move(self, legal_single_piece_moves, hand):
         legal_moves = self.game.board.legal_moves(hand)
-        while len(legal_moves[-1]) == 0:
-            del legal_moves[-1]
-            #TODO: Horrible algorithm.
-        interesting_moves = legal_moves[-1]
-        scored_moves, max_score = self.score_moves(interesting_moves)
+        scored_moves, max_score = self.score_moves(legal_moves)
         self.do_a_high_score_move(scored_moves, max_score)
 
 

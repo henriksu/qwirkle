@@ -5,6 +5,7 @@ from qwirkle.AI.basic_strategies import AI, SimpleBoardBasedProactiveExchange,\
     BestMultiMoveAI
 
 
+
 def run_single_player_AI(game, ai_player):
     ai = ai_player(game)
     while game.current_player is not None:
@@ -16,12 +17,12 @@ def run_single_player_AI(game, ai_player):
     return game
 
 
-if __name__ == '__main__':
+def main():
     scores = set()
-    for i in range(500):
+    for i in range(10):
         print(i)
         game = Game.make_new_game(num_players=1)
-        played_game = run_single_player_AI(game, AI)
+        played_game = run_single_player_AI(game, BestMultiMoveAI)
         player = played_game.players[0]
         score = player.total_score()
         rounds = len(player.scores)
@@ -30,3 +31,7 @@ if __name__ == '__main__':
     std = np.std(list(scores))
     print(mean)
     print(std)
+
+
+if __name__ == '__main__':
+    main()
