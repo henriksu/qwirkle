@@ -56,6 +56,7 @@ class Board():
         if move.is_allowed():
             score = move.score()
             self._add_to_board(tiles_and_positions)
+            # TODO: THe move should be stored too.
             return score
         else:
             raise IllegalMoveError()
@@ -102,16 +103,11 @@ class Board():
 
         moves_list = [single_piece_moves, two_piece_moves, three_piece_moves,
                       four_piece_moves, five_piece_moves, six_piece_moves]
-        result = []
+        result = set()
         for moves in moves_list:
-            new_moves = set()
             for move, _ in moves:
-                new_moves.add(move)
-            result.append(new_moves)
+                result.add(move)
         return result
-        # Does not take the union of the sets,
-        # because the highest paying move is guaranteed to
-        # be in the last non-empty set.
 
     def _get_single_piece_moves(self, hand):
         moves = set()
@@ -247,9 +243,8 @@ class Board():
         # including positions not adjacent to existing tiles.
         legal_moves = self.legal_moves(hand)
         result = set()
-        for moves in legal_moves:
-            for move in moves:
-                result.update(move.positions)
+        for move in legal_moves:
+            result.update(move.positions)
         return result
 
     def forbidden_positions(self):
