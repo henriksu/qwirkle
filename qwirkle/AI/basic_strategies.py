@@ -74,7 +74,8 @@ class BestSingleMoveAI(ExchangeAllIfExchanging):
 
 
 class BestMultiMoveAI(BestSingleMoveAI):
-    # avg.: 7.843 std.: 0.518
+    # avg.: 7.843 std.: 0.518 (assuming best move has most tiles)
+    # avg.: 8.057 std.: 0.512 (corrected)
 
     def choose_move(self, legal_single_piece_moves, hand):
         legal_moves = self.game.board.legal_moves(hand)

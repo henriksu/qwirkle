@@ -19,7 +19,7 @@ def run_single_player_AI(game, ai_player):
 
 def main():
     scores = set()
-    for i in range(10):
+    for i in range(300):
         print(i)
         game = Game.make_new_game(num_players=1)
         played_game = run_single_player_AI(game, BestMultiMoveAI)

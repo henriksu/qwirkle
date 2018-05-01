@@ -61,6 +61,6 @@ class RunnerLogger:
 
 
 if __name__ == "__main__":
-    for i in range(100):
+    for i in range(200):
         runner = RunnerLogger(BestMultiMoveAI)
         runner.run()
