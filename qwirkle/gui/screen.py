@@ -1,7 +1,9 @@
 from builtins import range
 import pygame, sys
 
+
 from pygame.locals import *
+from pygame import gfxdraw
 from qwirkle.game_logic.game import *
 from qwirkle.game_logic.tile import *
 from qwirkle.game_logic.board import *
@@ -340,43 +342,76 @@ def drawTile(tile, x, y, size):
     shapeSize = size/2
    
     if shape_code == Shape.CIRCLE:
-        pygame.draw.circle(DISPLAYSURF, color_code, (int(x + size/2), int(y + size/2)), int(size/4))
-    
+        gfxdraw.aacircle(DISPLAYSURF, int(x + size/2), int(y + size/2), int(size/2.7),color_code)
+        gfxdraw.filled_circle(DISPLAYSURF, int(x + size/2), int(y + size/2), int(size/2.7),color_code)
     elif shape_code == Shape.X:
-        pygame.draw.line(DISPLAYSURF, color_code, (shapex, shapey), (shapex + shapeSize, shapey + shapeSize), 5)
-        pygame.draw.line(DISPLAYSURF, color_code, (shapex, shapey + shapeSize), (shapex + shapeSize, shapey), 5)
-    
-    elif shape_code == Shape.DIAMOND:
-        pygame.draw.polygon(DISPLAYSURF, color_code, ((shapex, shapey + size/4),
-                                                      (shapex + size/4, shapey),
-                                                      (shapex + size/2, shapey + size/4),
-                                                      (shapex + size/4, shapey + size/2)))
-    
-    elif shape_code == Shape.SQUARE:
-        pygame.draw.rect(DISPLAYSURF,color_code, (shapex, shapey, shapeSize, shapeSize))
-        
-    elif shape_code == Shape.STAR:
         num_points = 4
         point_list = []
         center_x = x + size/2
         center_y = y + size/2
         for i in range(num_points * 2):
-                radius = size/4
+                radius = size/1.8
                 if i % 2 == 0:
-                        radius = radius // 2
-                ang = i * 3.14159 / num_points + 10 * 3.14159 / 60
+                        radius = radius / 3.2
+                ang = i * 3.14159 / num_points #+ 10 * 3.14159 / 60
                 x = center_x + int(math.cos(ang) * radius)
                 y = center_y + int(math.sin(ang) * radius)
                 point_list.append((x, y))
-        pygame.draw.polygon(DISPLAYSURF, color_code, point_list)
-        
+        gfxdraw.aapolygon(DISPLAYSURF, point_list, color_code)
+        gfxdraw.filled_polygon(DISPLAYSURF, point_list, color_code)
+
+
+#        pygame.draw.line(DISPLAYSURF, color_code, (shapex, shapey), (shapex + shapeSize, shapey + shapeSize), 5)
+#        pygame.draw.line(DISPLAYSURF, color_code, (shapex, shapey + shapeSize), (shapex + shapeSize, shapey), 5)
+
+    elif shape_code == Shape.DIAMOND:
+        gfxdraw.aapolygon(DISPLAYSURF, ((shapex, shapey + size/4),
+                                        (shapex + size/4, shapey),
+                                        (shapex + size/2, shapey + size/4),
+                                        (shapex + size/4, shapey + size/2)),
+                                        color_code)
+        gfxdraw.filled_polygon(DISPLAYSURF, ((shapex, shapey + size/4),
+                                        (shapex + size/4, shapey),
+                                        (shapex + size/2, shapey + size/4),
+                                        (shapex + size/4, shapey + size/2)),
+                                        color_code)
+
+    elif shape_code == Shape.SQUARE:
+        pygame.draw.rect(DISPLAYSURF,color_code, (shapex, shapey, shapeSize*1.15, shapeSize*1.15))
+
+    elif shape_code == Shape.STAR:
+        num_points = 8
+        point_list = []
+        center_x = x + size/2
+        center_y = y + size/2
+        for i in range(num_points * 2):
+                radius = size/2.5
+                if i % 2 == 1:
+                        radius = radius / 2.5
+                ang = i * 3.14159 / num_points #+ 10 * 3.14159 / 60
+                x = center_x + int(math.cos(ang) * radius)
+                y = center_y + int(math.sin(ang) * radius)
+                point_list.append((x, y))
+        gfxdraw.aapolygon(DISPLAYSURF, point_list, color_code)
+        gfxdraw.filled_polygon(DISPLAYSURF, point_list, color_code)
+
     elif shape_code == Shape.CLOVER:
-        pygame.draw.circle(DISPLAYSURF, color_code, ((int(shapex), int(shapey + size/4))), int(size/6))
-        pygame.draw.circle(DISPLAYSURF, color_code, ((int(shapex + size/4), int(shapey))), int(size/6))
-        pygame.draw.circle(DISPLAYSURF, color_code, ((int(shapex + size/2), int(shapey + size/4))), int(size/6))
-        pygame.draw.circle(DISPLAYSURF, color_code, ((int(shapex + size/4), int(shapey + size/2))), int(size/6))
-        pygame.draw.circle(DISPLAYSURF, color_code, ((int(shapex + size/4), int(shapey + size/4))), int(size/6))
-    
+        gfxdraw.aacircle(DISPLAYSURF, int(shapex), int(shapey + size/4), int(size/6), color_code)
+        gfxdraw.filled_circle(DISPLAYSURF, int(shapex), int(shapey + size/4), int(size/6), color_code)
+
+        gfxdraw.aacircle(DISPLAYSURF, int(shapex + size/4), int(shapey), int(size/6), color_code)
+        gfxdraw.filled_circle(DISPLAYSURF, int(shapex + size/4), int(shapey), int(size/6), color_code)
+
+        gfxdraw.aacircle(DISPLAYSURF, int(shapex + size/2), int(shapey + size/4), int(size/6), color_code)
+        gfxdraw.filled_circle(DISPLAYSURF, int(shapex + size/2), int(shapey + size/4), int(size/6), color_code)
+
+        gfxdraw.aacircle(DISPLAYSURF, int(shapex + size/4), int(shapey + size/2), int(size/6), color_code)
+        gfxdraw.filled_circle(DISPLAYSURF, int(shapex + size/4), int(shapey + size/2), int(size/6), color_code)
+
+        gfxdraw.aacircle(DISPLAYSURF, int(shapex + size/4), int(shapey + size/4), int(size/6),color_code)
+        gfxdraw.filled_circle(DISPLAYSURF, int(shapex + size/4), int(shapey + size/4), int(size/6),color_code)
+
+
 def getHandTileAtPixel(x, y, hand):
     space = 0
     for tile in hand:
