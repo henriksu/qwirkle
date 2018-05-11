@@ -3,10 +3,14 @@ import pygame, sys
 
 
 from pygame.locals import *
-from pygame import gfxdraw
 from qwirkle.game_logic.game import *
 from qwirkle.game_logic.tile import *
 from qwirkle.game_logic.board import *
+from qwirkle.gui.color_palette import (
+    BGCOLOR, LIGHTBGCOLOR, BOXCOLOR, HIGHLIGHTCOLOR,
+    BUTTONCOLOR, BUTTONCOLOR_HOVER, BUTTONTEXTCOLOR, BUTTONTEXTCOLOR_HOVER,
+    MESSAGECOLOR, TEXTCOLOR, ALLCOLORS, WHITE, GREEN, BLACK, BLUE, YELLOW)
+from qwirkle.gui.tile_art import TileDrawer
 
 FPS = 144 # frames per second, the general speed of the program
 WINDOWWIDTH = 1080 # size of window's width in pixels
@@ -22,39 +26,6 @@ assert (BOARDWIDTH * BOARDHEIGHT) % 2 == 0, 'Board needs to have an even number 
 XMARGIN = int((WINDOWWIDTH - (BOARDWIDTH * (BOXSIZE + GAPSIZE))) / 2)
 YMARGIN = int((WINDOWHEIGHT - (BOARDHEIGHT * (BOXSIZE + GAPSIZE))) / 2)
 
-#            R    G    B
-GRAY     = (100, 100, 100)
-NAVYBLUE = ( 60,  60, 100)
-WHITE    = (255, 255, 255)
-RED      = (255,   0,   0)
-GREEN    = (  0, 255,   0)
-BLUE     = (  0,   0, 255)
-YELLOW   = (255, 255,   0)
-ORANGE   = (255, 128,   0)
-PURPLE   = (255,   0, 255)
-CYAN     = (  0, 255, 255)
-BLACK    = (  0,   0,   0)
-
-TILE_COLOR_CODE = {
-    Color.RED: RED,
-    Color.ORANGE: ORANGE,
-    Color.YELLOW: YELLOW,
-    Color.GREEN: GREEN,
-    Color.BLUE: BLUE,
-    Color.PURPLE: PURPLE}
-
-BGCOLOR = NAVYBLUE
-LIGHTBGCOLOR = GRAY
-BOXCOLOR = WHITE
-HIGHLIGHTCOLOR = BLUE
-
-BASICFONTSIZE = 20
-BUTTONCOLOR = WHITE
-BUTTONCOLOR_HOVER = BLACK
-BUTTONTEXTCOLOR = BLACK
-BUTTONTEXTCOLOR_HOVER = GRAY
-MESSAGECOLOR = WHITE
-TEXTCOLOR = BLACK
 BASICFONTSIZE = 20
 
 
@@ -65,7 +36,6 @@ SQUARE = 'square'
 STAR = 'star'
 CLOVER = 'clover'
 
-ALLCOLORS = (RED, GREEN, BLUE, YELLOW, ORANGE, PURPLE, CYAN)
 ALLSHAPES = (CIRCLE, X, DIAMOND, SQUARE, STAR, CLOVER)
 
 
@@ -82,10 +52,11 @@ def draw_board(mainBoard):
         drawBoardTile(tile, tilex, tiley)
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, MOVE_SURF, MOVE_RECT, BOXSIZE, GAPSIZE
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, MOVE_SURF, MOVE_RECT, BOXSIZE, GAPSIZE, tile_drawer
     
     pygame.init()
     
+    tile_drawer = TileDrawer(BOXSIZE)
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 
@@ -332,84 +303,9 @@ def drawBoardTile(tile, tilex, tiley): #new method to use on board instead of ju
     y = WINDOWHEIGHT/2 - BOXSIZE/2 + tiley*BOXSIZE + tiley*GAPSIZE
     drawTile(tile, x, y, BOXSIZE)
          
-def drawTile(tile, x, y, size):
-    color_code = TILE_COLOR_CODE[tile.color]
-    shape_code = tile.shape
-    pygame.draw.rect(DISPLAYSURF,BLACK, (x, y, size, size))
-    
-    shapex = x + size/4
-    shapey = y + size/4
-    shapeSize = size/2
-   
-    if shape_code == Shape.CIRCLE:
-        gfxdraw.aacircle(DISPLAYSURF, int(x + size/2), int(y + size/2), int(size/2.7),color_code)
-        gfxdraw.filled_circle(DISPLAYSURF, int(x + size/2), int(y + size/2), int(size/2.7),color_code)
-    elif shape_code == Shape.X:
-        num_points = 4
-        point_list = []
-        center_x = x + size/2
-        center_y = y + size/2
-        for i in range(num_points * 2):
-                radius = size/1.8
-                if i % 2 == 0:
-                        radius = radius / 3.2
-                ang = i * 3.14159 / num_points #+ 10 * 3.14159 / 60
-                x = center_x + int(math.cos(ang) * radius)
-                y = center_y + int(math.sin(ang) * radius)
-                point_list.append((x, y))
-        gfxdraw.aapolygon(DISPLAYSURF, point_list, color_code)
-        gfxdraw.filled_polygon(DISPLAYSURF, point_list, color_code)
-
-
-#        pygame.draw.line(DISPLAYSURF, color_code, (shapex, shapey), (shapex + shapeSize, shapey + shapeSize), 5)
-#        pygame.draw.line(DISPLAYSURF, color_code, (shapex, shapey + shapeSize), (shapex + shapeSize, shapey), 5)
-
-    elif shape_code == Shape.DIAMOND:
-        gfxdraw.aapolygon(DISPLAYSURF, ((shapex, shapey + size/4),
-                                        (shapex + size/4, shapey),
-                                        (shapex + size/2, shapey + size/4),
-                                        (shapex + size/4, shapey + size/2)),
-                                        color_code)
-        gfxdraw.filled_polygon(DISPLAYSURF, ((shapex, shapey + size/4),
-                                        (shapex + size/4, shapey),
-                                        (shapex + size/2, shapey + size/4),
-                                        (shapex + size/4, shapey + size/2)),
-                                        color_code)
-
-    elif shape_code == Shape.SQUARE:
-        pygame.draw.rect(DISPLAYSURF,color_code, (shapex, shapey, shapeSize*1.15, shapeSize*1.15))
-
-    elif shape_code == Shape.STAR:
-        num_points = 8
-        point_list = []
-        center_x = x + size/2
-        center_y = y + size/2
-        for i in range(num_points * 2):
-                radius = size/2.5
-                if i % 2 == 1:
-                        radius = radius / 2.5
-                ang = i * 3.14159 / num_points #+ 10 * 3.14159 / 60
-                x = center_x + int(math.cos(ang) * radius)
-                y = center_y + int(math.sin(ang) * radius)
-                point_list.append((x, y))
-        gfxdraw.aapolygon(DISPLAYSURF, point_list, color_code)
-        gfxdraw.filled_polygon(DISPLAYSURF, point_list, color_code)
-
-    elif shape_code == Shape.CLOVER:
-        gfxdraw.aacircle(DISPLAYSURF, int(shapex), int(shapey + size/4), int(size/6), color_code)
-        gfxdraw.filled_circle(DISPLAYSURF, int(shapex), int(shapey + size/4), int(size/6), color_code)
-
-        gfxdraw.aacircle(DISPLAYSURF, int(shapex + size/4), int(shapey), int(size/6), color_code)
-        gfxdraw.filled_circle(DISPLAYSURF, int(shapex + size/4), int(shapey), int(size/6), color_code)
-
-        gfxdraw.aacircle(DISPLAYSURF, int(shapex + size/2), int(shapey + size/4), int(size/6), color_code)
-        gfxdraw.filled_circle(DISPLAYSURF, int(shapex + size/2), int(shapey + size/4), int(size/6), color_code)
-
-        gfxdraw.aacircle(DISPLAYSURF, int(shapex + size/4), int(shapey + size/2), int(size/6), color_code)
-        gfxdraw.filled_circle(DISPLAYSURF, int(shapex + size/4), int(shapey + size/2), int(size/6), color_code)
-
-        gfxdraw.aacircle(DISPLAYSURF, int(shapex + size/4), int(shapey + size/4), int(size/6),color_code)
-        gfxdraw.filled_circle(DISPLAYSURF, int(shapex + size/4), int(shapey + size/4), int(size/6),color_code)
+def drawTile(tile, x_i, y_i, size):
+    tile_surface = tile_drawer.get_tile_surface(tile)
+    DISPLAYSURF.blit(tile_surface, dest=(x_i,y_i))
 
 
 def getHandTileAtPixel(x, y, hand):
