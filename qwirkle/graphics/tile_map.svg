@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="6000"
+     height="6000"
+>
+
+  <use xlink:href="tiles.svg#circle_tile" style="fill:red" x="4" y="4" width="992" height="992" />
+  <use xlink:href="tiles.svg#circle_tile" style="fill:darkorange" x="4" y="1004" width="992" height="992" />
+  <use xlink:href="tiles.svg#circle_tile" style="fill:yellow" x="4" y="2004" width="992" height="992" />
+  <use xlink:href="tiles.svg#circle_tile" style="fill:green" x="4" y="3004" width="992" height="992" />
+  <use xlink:href="tiles.svg#circle_tile" style="fill:blue" x="4" y="4004" width="992" height="992" />
+  <use xlink:href="tiles.svg#circle_tile" style="fill:blueviolet" x="4" y="5004" width="992" height="992" />
+
+  <use xlink:href="tiles.svg#x_tile" style="fill:red" x="1004" y="4" width="992" height="992" />
+  <use xlink:href="tiles.svg#x_tile" style="fill:darkorange" x="1004" y="1004" width="992" height="992" />
+  <use xlink:href="tiles.svg#x_tile" style="fill:yellow" x="1004" y="2004" width="992" height="992" />
+  <use xlink:href="tiles.svg#x_tile" style="fill:green" x="1004" y="3004" width="992" height="992" />
+  <use xlink:href="tiles.svg#x_tile" style="fill:blue" x="1004" y="4004" width="992" height="992" />
+  <use xlink:href="tiles.svg#x_tile" style="fill:blueviolet" x="1004" y="5004" width="992" height="992" />
+
+  <use xlink:href="tiles.svg#diamond_tile" style="fill:red" x="2004" y="4" width="992" height="992" />
+  <use xlink:href="tiles.svg#diamond_tile" style="fill:darkorange" x="2004" y="1004" width="992" height="992" />
+  <use xlink:href="tiles.svg#diamond_tile" style="fill:yellow" x="2004" y="2004" width="992" height="992" />
+  <use xlink:href="tiles.svg#diamond_tile" style="fill:green" x="2004" y="3004" width="992" height="992" />
+  <use xlink:href="tiles.svg#diamond_tile" style="fill:blue" x="2004" y="4004" width="992" height="992" />
+  <use xlink:href="tiles.svg#diamond_tile" style="fill:blueviolet" x="2004" y="5004" width="992" height="992" />
+
+  <use xlink:href="tiles.svg#square_tile" style="fill:red" x="3004" y="4" width="992" height="992" />
+  <use xlink:href="tiles.svg#square_tile" style="fill:darkorange" x="3004" y="1004" width="992" height="992" />
+  <use xlink:href="tiles.svg#square_tile" style="fill:yellow" x="3004" y="2004" width="992" height="992" />
+  <use xlink:href="tiles.svg#square_tile" style="fill:green" x="3004" y="3004" width="992" height="992" />
+  <use xlink:href="tiles.svg#square_tile" style="fill:blue" x="3004" y="4004" width="992" height="992" />
+  <use xlink:href="tiles.svg#square_tile" style="fill:blueviolet" x="3004" y="5004" width="992" height="992" />
+
+  <use xlink:href="tiles.svg#star_tile" style="fill:red" x="4004" y="4" width="992" height="992" />
+  <use xlink:href="tiles.svg#star_tile" style="fill:darkorange" x="4004" y="1004" width="992" height="992" />
+  <use xlink:href="tiles.svg#star_tile" style="fill:yellow" x="4004" y="2004" width="992" height="992" />
+  <use xlink:href="tiles.svg#star_tile" style="fill:green" x="4004" y="3004" width="992" height="992" />
+  <use xlink:href="tiles.svg#star_tile" style="fill:blue" x="4004" y="4004" width="992" height="992" />
+  <use xlink:href="tiles.svg#star_tile" style="fill:blueviolet" x="4004" y="5004" width="992" height="992" />
+
+  <use xlink:href="tiles.svg#clover_tile" style="fill:red" x="5004" y="4" width="992" height="992" />
+  <use xlink:href="tiles.svg#clover_tile" style="fill:darkorange" x="5004" y="1004" width="992" height="992" />
+  <use xlink:href="tiles.svg#clover_tile" style="fill:yellow" x="5004" y="2004" width="992" height="992" />
+  <use xlink:href="tiles.svg#clover_tile" style="fill:green" x="5004" y="3004" width="992" height="992" />
+  <use xlink:href="tiles.svg#clover_tile" style="fill:blue" x="5004" y="4004" width="992" height="992" />
+  <use xlink:href="tiles.svg#clover_tile" style="fill:blueviolet" x="5004" y="5004" width="992" height="992" />
+
+</svg>
