@@ -2,6 +2,8 @@ import os
 import pygame
 from qwirkle.game_logic.tile import Color, Shape
 
+# These indexes HAPPENS to be the same as the ones used in the Enums.
+# They are repeated here, just in case one of them changes.
 COLOR_IDXS = {
     Color.RED: 0,
     Color.ORANGE: 1,
