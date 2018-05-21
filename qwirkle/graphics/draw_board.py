@@ -1,6 +1,6 @@
-import xml.etree.ElementTree as ET
+import lxml.etree as etree
 from qwirkle.game_logic.tile import Color, Shape
-from qwirkle.graphics.example_game import make_tiles
+from qwirkle.graphics.example_game import make_tiles, make_moves
 # TODO: install lxml for better formatting of result.
 
 
@@ -32,9 +32,9 @@ class Board():
         self.y_max = 0
 
     def make_tile_tag(self, position, tile):
-        elem = ET.Element("use")
+        elem = etree.Element("use")
         shape_string = SHAPE_NAMES[tile.shape]
-        elem.set("xlink:href", "#{}_tile".format(shape_string))
+        elem.attrib["{http://www.w3.org/1999/xlink}href"] = "#{}_tile".format(shape_string)
         color_string = COLOR_NAMES[tile.color]
         elem.set("style", "fill:{}".format(color_string))
 
@@ -64,17 +64,22 @@ class Board():
 
 
 def get_tile_prototypes():
-    tree = ET.parse('tiles.svg')
+    parser = etree.XMLParser(remove_blank_text=True)
+    tree = etree.parse('tiles.svg', parser)
     root = tree.getroot()
     tile_defs = root.find('{http://www.w3.org/2000/svg}defs')
     return tile_defs
 
 
 def create_svg_skeleton():
-    ET.register_namespace('', "http://www.w3.org/2000/svg")
-    ET.register_namespace('xlink', "http://www.w3.org/1999/xlink")
-    svg_root = ET.Element("svg")
-    svg = ET.ElementTree(svg_root)
+    SVG_NS = "http://www.w3.org/2000/svg"
+    XLINK_NS = "http://www.w3.org/1999/xlink"
+    NS_MAP = {None: SVG_NS, "xlink": XLINK_NS}
+    rootName = etree.QName("svg")
+#    ET.register_namespace(None, "http://www.w3.org/2000/svg")
+#    ET.register_namespace('xlink', "http://www.w3.org/1999/xlink")
+    svg_root = etree.Element(rootName, nsmap=NS_MAP)
+    svg = etree.ElementTree(svg_root)
     return svg
 
 
@@ -87,13 +92,53 @@ def populate_board(svg_root, tiles_and_positions):
     svg_root.set("viewBox", "{} {} {} {}".format(*view_box))
 
 
+def populate_animated_board(svg_root, moves):
+    board = Board()
+    N = len(moves)
+    num = 0  # slight offset at beginning.
+    for move in moves:
+        num += 1
+        node = etree.Element("g")
+        node.set("id", "move-{}".format(num))
+        node.set("opacity", "0")
+        for pos, tile in move:
+            elem = board.make_tile_tag(pos, tile)
+            node.append(elem)
+        svg_root.append(node)
+    dur = "0.2s"
+    sek_interval = 0.7
+    for i in range(N):
+        animation = etree.Element("animate")
+        animation.set("{http://www.w3.org/1999/xlink}href", "#move-{}".format(i+1))
+        animation.set("attributeName", "opacity")
+        animation.set("attributeType", "XML")
+        animation.set("begin", "{:.2f}s".format(sek_interval*(i+1)))
+        animation.set("dur", dur)
+        animation.set("from", "0")
+        animation.set("to", "1")
+        animation.set("fill", "freeze")
+        svg_root.append(animation)
+    view_box = board.get_view_box()
+    svg_root.set("viewBox", "{} {} {} {}".format(*view_box))
+
+
 def make_svg(file_name, tiles_and_positions):
     svg = create_svg_skeleton()
     svg_root = svg.getroot()
     tile_defs = get_tile_prototypes()
     svg_root.append(tile_defs)
     populate_board(svg_root, tiles_and_positions)
-    svg.write(file_name, encoding="UTF-8")
+    svg.write(file_name, encoding="UTF-8", pretty_print=True, xml_declaration=True)
+
+
+def make_animated_svg(file_name, moves):
+    svg = create_svg_skeleton()
+    svg_root = svg.getroot()
+    tile_defs = get_tile_prototypes()
+    svg_root.append(tile_defs)
+    populate_animated_board(svg_root, moves)
+    svg.write(file_name, encoding="UTF-8", pretty_print=True, xml_declaration=True)
 
 
 make_svg("test.svg", make_tiles())
+make_animated_svg("test2.svg", make_moves())

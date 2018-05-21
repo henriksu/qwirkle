@@ -78,3 +78,21 @@ def make_tiles():
             (pos23, tile23),
             (pos24, tile24),
             (pos25, tile25)]
+
+
+def make_moves():
+    tiles = make_tiles()
+    moves = []
+    moves.append(tiles[:3])
+    moves.append(tiles[3:6])
+    moves.append(tiles[6:7])
+    moves.append(tiles[7:9])
+    moves.append(tiles[9:11])
+    moves.append(tiles[11:13])
+    moves.append(tiles[13:15])
+    moves.append(tiles[15:17])
+    moves.append(tiles[17:19])
+    moves.append(tiles[19:20])
+    moves.append(tiles[20:23])
+    moves.append(tiles[23:25])
+    return moves
