@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="qwirkle_game"
+xmlns="qwirkle_game"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.w3.org/2001/XMLSchema https://www.w3.org/2009/XMLSchema/XMLSchema.xsd"
+elementFormDefault="qualified">
+
+<xs:simpleType name="tileColor">
+	<xs:restriction base="xs:string">
+		 <xs:enumeration value="red"/>
+		 <xs:enumeration value="orange"/>
+		 <xs:enumeration value="yellow"/>
+		 <xs:enumeration value="green"/>
+		 <xs:enumeration value="blue"/>
+		 <xs:enumeration value="purple"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="tileShape">
+	<xs:restriction base="xs:string">
+		 <xs:enumeration value="circle"/>
+		 <xs:enumeration value="x"/>
+		 <xs:enumeration value="diamond"/>
+		 <xs:enumeration value="square"/>
+		 <xs:enumeration value="star"/>
+		 <xs:enumeration value="clover"/>		 
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="tile">
+		<xs:attribute name="color" type="tileColor" use="required"/>
+		<xs:attribute name="shape" type="tileShape" use="required"/>		
+</xs:complexType>
+
+<xs:simpleType name="boardCoordinate">
+	<xs:restriction base="xs:integer">
+		<xs:minInclusive value="-90"/>
+		<xs:maxInclusive value="90"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="position">
+		<xs:attribute name="x" type="boardCoordinate" use="required"/>
+		<xs:attribute name="y" type="boardCoordinate" use="required"/>		
+</xs:complexType>
+
+<xs:complexType name="placement">
+	<xs:all>
+		<xs:element name="tile" type="tile"/>
+		<xs:element name="position" type="position"/>		
+	</xs:all>
+</xs:complexType>
+
+<xs:complexType name="placements">
+	<xs:sequence>
+		<xs:element name="placement" type="placement" minOccurs="1" maxOccurs="6"/>
+	</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="draw">
+	<xs:sequence>
+		<xs:element name="tile" type="tile" minOccurs="0" maxOccurs="6"/>
+	</xs:sequence>
+</xs:complexType>
+<xs:complexType name="tiles">
+	<xs:sequence>
+		<xs:element name="tile" type="tile" minOccurs="1" maxOccurs="6"/>
+	</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="boardTurn">
+	<xs:all>
+		<xs:element name="placements" type="placements"/>
+		<xs:element name="draw" type="draw" minOccurs="0"/>
+	</xs:all>
+</xs:complexType>
+
+<xs:complexType name="exchangeTilesTurn">
+	<xs:all>
+		<xs:element name="return" type="tiles"/>
+		<xs:element name="draw" type="tiles"/>
+	</xs:all>
+</xs:complexType>
+
+<xs:complexType name="_Empty"/>
+
+<xs:complexType name="turn">
+	<xs:choice>
+		<xs:element name="board" type="boardTurn"/>
+		<xs:element name="exchangeTiles" type="exchangeTilesTurn"/>
+		<xs:element name="pass" type="_Empty"/>	
+	</xs:choice>
+	<xs:attribute name="player" type="xs:integer" use="required" />
+	<xs:attribute name="move" type="xs:integer" use="required" />
+</xs:complexType>
+
+<xs:complexType name="player">
+	<xs:sequence>
+		<xs:element name="tile" type="tile" maxOccurs="6" minOccurs="6" />
+	</xs:sequence>
+	<xs:attribute name="player_no" type="xs:integer" use="required" />
+</xs:complexType>
+
+<xs:element name="game">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="player" type="player" minOccurs="1" maxOccurs="4" />
+			<xs:element name="turn" type="turn" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+</xs:schema>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<game xmlns="qwirkle_game"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="qwirkle_game game.xsd">
+<player player_no="1">
+<tile color="red" shape="x" />
+<tile color="red" shape="x" />
+<tile color="red" shape="x" />
+<tile color="red" shape="x" />
+<tile color="red" shape="x" />
+<tile color="red" shape="x" />
+</player>
+</game>
